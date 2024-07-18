@@ -1,0 +1,2 @@
+INSERT INTO adrese (id, drzava, mesto, ulica, broj)
+VALUES (1, 'Srbija', 'Beograd', 'Skolska', 14);
