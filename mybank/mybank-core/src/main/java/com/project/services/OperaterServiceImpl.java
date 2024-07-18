@@ -1,7 +1,9 @@
 package com.project.services;
 
+import com.project.domain.entities.KlijentInfo;
 import com.project.domain.entities.Operater;
 import com.project.domain.repositoryinterfaces.OperaterRepository;
+import com.project.dtos.klijentInfo.KlijentInfoDto;
 import com.project.dtos.operater.OperaterDto;
 import com.project.serviceinterfaces.OperaterService;
 import org.modelmapper.ModelMapper;
@@ -49,4 +51,5 @@ public class OperaterServiceImpl implements OperaterService {
         operaterRepository.save(operater);
         return operaterDto;
     }
+
 }

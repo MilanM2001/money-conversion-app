@@ -1,5 +1,6 @@
 package com.project.serviceinterfaces;
 
+import com.project.dtos.klijentInfo.KlijentInfoDto;
 import com.project.dtos.operater.OperaterDto;
 
 import java.util.List;

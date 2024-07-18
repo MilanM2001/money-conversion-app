@@ -48,6 +48,11 @@ public class KlijentServiceImpl implements KlijentService {
 
     @Override
     public KlijentDto create(KlijentDto klijentDto) {
+
+        if (klijentRepository.findOneByEmail(klijentDto.getEmail()) != null) {
+            return null;
+        }
+
         KlijentInfo klijentInfo = klijentInfoRepository.findOneByJmbg(klijentDto.getJmbg());
         Klijent klijent = new Klijent();
 
