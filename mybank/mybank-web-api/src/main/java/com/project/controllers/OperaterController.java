@@ -37,7 +37,7 @@ public class OperaterController {
     }
 
     @GetMapping("/find/{email}")
-    public ResponseEntity<OperaterDto> findByEmail(@PathVariable String email) {
+    public ResponseEntity<OperaterDto> findByEmail(@PathVariable("email") String email) {
         OperaterDto operaterDto = operaterService.findOneByEmail(email);
         if (operaterDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -46,9 +46,14 @@ public class OperaterController {
         return new ResponseEntity<>(operaterDto, HttpStatus.OK);
     }
 
+    //Kreiranje operatera
     @PostMapping("/create")
     public ResponseEntity<OperaterDto> create(@RequestBody OperaterDto operaterDto) {
         OperaterDto operater = operaterService.create(operaterDto);
+
+        if (operater == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
 
         return new ResponseEntity<>(operater, HttpStatus.CREATED);
     }
@@ -81,8 +86,9 @@ public class OperaterController {
     @PutMapping("/updateClientInfo/{jmbg}")
     public ResponseEntity<UpdateKlijentInfoDto> updateClientInfo(@RequestBody UpdateKlijentInfoDto updateKlijentInfoDto, @PathVariable("jmbg") String jmbg) {
         UpdateKlijentInfoDto updateKlijent = klijentInfoService.update(updateKlijentInfoDto, jmbg);
+
         if (updateKlijent == null) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(updateKlijent, HttpStatus.OK);

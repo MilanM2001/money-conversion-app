@@ -16,6 +16,7 @@
 		<module>mybank-app</module>
         <module>mybank-api</module>
 		<module>mybank-web-api</module>
+		<module>mybank-shared</module>
     </modules>
 
 	<properties>

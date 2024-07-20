@@ -29,6 +29,7 @@ public class AdresaServiceImpl implements AdresaService {
     public List<AdresaDto> findAll() {
         List<Adresa> adrese = adresaRepository.findAll();
         List<AdresaDto> adreseDto = modelMapper.map(adrese, new TypeToken<List<AdresaDto>>() {}.getType());
+
         return adreseDto;
     }
 
@@ -39,6 +40,7 @@ public class AdresaServiceImpl implements AdresaService {
             return null;
         }
         AdresaDto adresaDto = modelMapper.map(adresa, AdresaDto.class);
+
         return adresaDto;
     }
 

@@ -46,6 +46,13 @@ public class OperaterServiceImpl implements OperaterService {
 
     @Override
     public OperaterDto create(OperaterDto operaterDto) {
+
+        Operater existingOperater = operaterRepository.findOneByEmail(operaterDto.getEmail());
+
+        if (existingOperater != null) {
+            return null;
+        }
+
         Operater operater = modelMapper.map(operaterDto, Operater.class);
 
         operaterRepository.save(operater);
