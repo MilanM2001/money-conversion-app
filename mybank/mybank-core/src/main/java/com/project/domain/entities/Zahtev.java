@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -41,7 +42,7 @@ public class Zahtev {
     @Column(name = "kreditni_limit", nullable = false)
     private int kreditniLimit;
 
-    @Column(name = "broj_racuna", nullable = false)
+    @Column(name = "broj_racuna", unique = true, nullable = false)
     private String brojRacuna;
 
     @Column(name = "status_zahteva", nullable = false)
@@ -58,10 +59,10 @@ public class Zahtev {
 
     @Column(name = "datum_zahteva", nullable = false)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date datumZahteva;
+    private LocalDate datumZahteva;
 
     @Column(name = "datum_odluke", nullable = true)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private Date datumOdluke;
+    private LocalDate datumOdluke;
 
 }

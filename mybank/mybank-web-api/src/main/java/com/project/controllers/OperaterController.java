@@ -76,7 +76,7 @@ public class OperaterController {
         KlijentDto klijent = klijentService.create(klijentDto);
 
         if (klijent == null) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(klijent, HttpStatus.CREATED);

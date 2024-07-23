@@ -49,9 +49,15 @@ public class KlijentServiceImpl implements KlijentService {
     @Override
     public KlijentDto create(KlijentDto klijentDto) {
 
-        if (klijentRepository.findOneByEmail(klijentDto.getEmail()) != null) {
+
+        if (klijentInfoRepository.findOneByJmbg(klijentDto.getJmbg()) == null) {
             return null;
         }
+
+        //Ne sme dva ista emaila
+//        if (klijentRepository.findOneByEmail(klijentDto.getEmail()) != null) {
+//            return null;
+//        }
 
         KlijentInfo klijentInfo = klijentInfoRepository.findOneByJmbg(klijentDto.getJmbg());
         Klijent klijent = new Klijent();
