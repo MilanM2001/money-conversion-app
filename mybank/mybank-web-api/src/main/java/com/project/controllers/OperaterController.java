@@ -4,6 +4,8 @@ import com.project.dtos.klijent.KlijentDto;
 import com.project.dtos.klijentInfo.KlijentInfoDto;
 import com.project.dtos.klijentInfo.UpdateKlijentInfoDto;
 import com.project.dtos.operater.OperaterDto;
+import com.project.exceptions.ClientAlreadyExistsException;
+import com.project.exceptions.ClientInfoNotFoundException;
 import com.project.serviceinterfaces.KlijentInfoService;
 import com.project.serviceinterfaces.KlijentService;
 import com.project.serviceinterfaces.OperaterService;
@@ -70,16 +72,25 @@ public class OperaterController {
         return new ResponseEntity<>(klijentInfo, HttpStatus.CREATED);
     }
 
+    //TODO:
+    //Different errors depending on the case that a client info does not exist
+    // or if a client already exists with the given JMBG
+
     //Operater kreira nalog klijenta
     @PostMapping("/createClient")
     public ResponseEntity<KlijentDto> createClient(@RequestBody KlijentDto klijentDto) {
-        KlijentDto klijent = klijentService.create(klijentDto);
+        try {
+            KlijentDto klijent = klijentService.create(klijentDto);
 
-        if (klijent == null) {
+            return new ResponseEntity<>(klijent, HttpStatus.CREATED);
+
+        } catch (ClientInfoNotFoundException ex) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (ClientAlreadyExistsException ex) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(klijent, HttpStatus.CREATED);
     }
 
     //Operater upravlja podacima klijenta

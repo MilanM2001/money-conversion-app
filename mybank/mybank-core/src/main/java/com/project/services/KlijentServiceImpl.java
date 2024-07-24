@@ -6,6 +6,8 @@ import com.project.domain.repositoryinterfaces.KlijentInfoRepository;
 import com.project.domain.repositoryinterfaces.KlijentRepository;
 
 import com.project.dtos.klijent.KlijentDto;
+import com.project.exceptions.ClientAlreadyExistsException;
+import com.project.exceptions.ClientInfoNotFoundException;
 import com.project.serviceinterfaces.KlijentService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -49,15 +51,15 @@ public class KlijentServiceImpl implements KlijentService {
     @Override
     public KlijentDto create(KlijentDto klijentDto) {
 
-
+        //If Client Info with the given JMBG does not exist
         if (klijentInfoRepository.findOneByJmbg(klijentDto.getJmbg()) == null) {
-            return null;
+            throw new ClientInfoNotFoundException("Client with the given jmbg does not exist: " + klijentDto.getJmbg());
         }
 
-        //Ne sme dva ista emaila
-//        if (klijentRepository.findOneByEmail(klijentDto.getEmail()) != null) {
-//            return null;
-//        }
+        //If a Client already exists with the given email
+        if (klijentRepository.findOneByEmail(klijentDto.getEmail()) != null) {
+            throw new ClientAlreadyExistsException("Client with the given email already exists: " + klijentDto.getEmail());
+        }
 
         KlijentInfo klijentInfo = klijentInfoRepository.findOneByJmbg(klijentDto.getJmbg());
         Klijent klijent = new Klijent();
@@ -65,7 +67,6 @@ public class KlijentServiceImpl implements KlijentService {
         klijent.setKlijentInfo(klijentInfo);
         klijent.setEmail(klijentDto.getEmail());
         klijent.setPassword(klijentDto.getPassword());
-//        Klijent klijent = modelMapper.map(klijentDto, Klijent.class);
 
         klijentRepository.save(klijent);
         return klijentDto;
