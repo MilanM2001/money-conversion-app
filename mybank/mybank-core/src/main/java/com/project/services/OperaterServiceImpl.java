@@ -1,10 +1,9 @@
 package com.project.services;
 
-import com.project.domain.entities.KlijentInfo;
 import com.project.domain.entities.Operater;
 import com.project.domain.repositoryinterfaces.OperaterRepository;
-import com.project.dtos.klijentInfo.KlijentInfoDto;
-import com.project.dtos.operater.OperaterDto;
+import com.project.dtos.operater.OperaterRequestDto;
+import com.project.dtos.operater.OperaterResponseDto;
 import com.project.serviceinterfaces.OperaterService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -26,37 +25,37 @@ public class OperaterServiceImpl implements OperaterService {
     }
 
     @Override
-    public List<OperaterDto> findAll() {
+    public List<OperaterResponseDto> findAll() {
         List<Operater> operateri = operaterRepository.findAll();
-        List<OperaterDto> operateriDto = modelMapper.map(operateri, new TypeToken<List<OperaterDto>>() {}.getType());
+        List<OperaterResponseDto> operateriDto = modelMapper.map(operateri, new TypeToken<List<OperaterResponseDto>>() {}.getType());
 
         return operateriDto;
     }
 
     @Override
-    public OperaterDto findOneByEmail(String email) {
+    public OperaterResponseDto findOneByEmail(String email) {
         Operater operater = operaterRepository.findOneByEmail(email);
         if (operater == null) {
             return null;
         }
 
-        OperaterDto operaterDto = modelMapper.map(operater, OperaterDto.class);
-        return operaterDto;
+        OperaterResponseDto operaterResponseDto = modelMapper.map(operater, OperaterResponseDto.class);
+        return operaterResponseDto;
     }
 
     @Override
-    public OperaterDto create(OperaterDto operaterDto) {
+    public OperaterRequestDto create(OperaterRequestDto operaterRequestDto) {
 
-        Operater existingOperater = operaterRepository.findOneByEmail(operaterDto.getEmail());
+        Operater existingOperater = operaterRepository.findOneByEmail(operaterRequestDto.getEmail());
 
         if (existingOperater != null) {
             return null;
         }
 
-        Operater operater = modelMapper.map(operaterDto, Operater.class);
+        Operater operater = modelMapper.map(operaterRequestDto, Operater.class);
 
         operaterRepository.save(operater);
-        return operaterDto;
+        return operaterRequestDto;
     }
 
 }

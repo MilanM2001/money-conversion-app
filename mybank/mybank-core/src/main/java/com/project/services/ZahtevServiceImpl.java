@@ -6,10 +6,11 @@ import com.project.domain.entities.Zahtev;
 import com.project.domain.repositoryinterfaces.KlijentRepository;
 import com.project.domain.repositoryinterfaces.RacunRepository;
 import com.project.domain.repositoryinterfaces.ZahtevRepository;
-import com.project.dtos.zahtev.PostZahtevDto;
-import com.project.dtos.zahtev.ZahtevDto;
+import com.project.dtos.zahtev.ZahtevRequestDto;
+import com.project.dtos.zahtev.ZahtevResponseDto;
 import com.project.enums.StatusRacuna;
 import com.project.enums.StatusZahteva;
+import com.project.enums.TipRacuna;
 import com.project.enums.TipZahteva;
 import com.project.serviceinterfaces.ZahtevService;
 import org.modelmapper.ModelMapper;
@@ -41,23 +42,23 @@ public class ZahtevServiceImpl implements ZahtevService {
 
 
     @Override
-    public List<ZahtevDto> findAll() {
+    public List<ZahtevResponseDto> findAll() {
         List<Zahtev> zahtevi = zahtevRepository.findAll();
-        List<ZahtevDto> zahteviDto = modelMapper.map(zahtevi, new TypeToken<List<ZahtevDto>>() {}.getType());
+        List<ZahtevResponseDto> zahteviDto = modelMapper.map(zahtevi, new TypeToken<List<ZahtevResponseDto>>() {}.getType());
 
         return zahteviDto;
     }
 
     @Override
-    public List<ZahtevDto> findByClientsEmail(String email) {
+    public List<ZahtevResponseDto> findByClientsEmail(String email) {
         List<Zahtev> zahtevi = zahtevRepository.findByClientEmail(email);
-        List<ZahtevDto> zahteviDto = modelMapper.map(zahtevi, new TypeToken<List<ZahtevDto>>() {}.getType());
+        List<ZahtevResponseDto> zahteviDto = modelMapper.map(zahtevi, new TypeToken<List<ZahtevResponseDto>>() {}.getType());
 
         return zahteviDto;
     }
 
     @Override
-    public PostZahtevDto create(PostZahtevDto postZahtevDto, String email) {
+    public ZahtevRequestDto create(ZahtevRequestDto zahtevRequestDto, String email) {
 
         Klijent klijent = klijentRepository.findOneByEmail(email);
 
@@ -65,7 +66,7 @@ public class ZahtevServiceImpl implements ZahtevService {
             return null;
         }
 
-        Zahtev zahtev = modelMapper.map(postZahtevDto, Zahtev.class);
+        Zahtev zahtev = modelMapper.map(zahtevRequestDto, Zahtev.class);
 
         zahtev.setTipZahteva(TipZahteva.OTVARANJE);
         zahtev.setKreditniLimit(0);
@@ -76,13 +77,13 @@ public class ZahtevServiceImpl implements ZahtevService {
 
         zahtevRepository.save(zahtev);
 
-        return postZahtevDto;
+        return zahtevRequestDto;
     }
 
     @Override
-    public ZahtevDto decide(String brojRacuna, String decision) {
+    public ZahtevResponseDto decide(String brojRacuna, String decision) {
         Zahtev zahtev = zahtevRepository.findByBrojRacuna(brojRacuna);
-        ZahtevDto zahtevDto = modelMapper.map(zahtev, ZahtevDto.class);
+        ZahtevResponseDto zahtevResponseDto = modelMapper.map(zahtev, ZahtevResponseDto.class);
 
         if (zahtev == null) {
             return null;
@@ -105,9 +106,15 @@ public class ZahtevServiceImpl implements ZahtevService {
             racun.setTipRacuna(zahtev.getTipRacuna());
             racun.setBrojRacuna(zahtev.getBrojRacuna());
             racun.setTrenutniIznos(0);
-            racun.setKreditniLimit(1000);
+
+            if (racun.getTipRacuna().equals(TipRacuna.TRANSAKCIONI)) {
+                racun.setKreditniLimit(0);
+            } else if (racun.getTipRacuna().equals(TipRacuna.KREDITNI)) {
+                racun.setKreditniLimit(zahtev.getKreditniLimit());
+            }
+
             racun.setValuta(zahtev.getValuta());
-            racun.setStatusRacuna(StatusRacuna.KREIRAN);
+            racun.setStatusRacuna(StatusRacuna.AKTIVAN);
             racun.setDatumKreiranja(LocalDate.now());
             racun.setDatumPoslednjePromene(LocalDate.now());
             racun.setVersion("0");
@@ -116,6 +123,6 @@ public class ZahtevServiceImpl implements ZahtevService {
             racunRepository.save(racun);
         }
 
-        return zahtevDto;
+        return zahtevResponseDto;
     }
 }

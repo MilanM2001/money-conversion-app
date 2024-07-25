@@ -1,7 +1,7 @@
 package com.project.controllers;
 
-import com.project.dtos.zahtev.PostZahtevDto;
-import com.project.dtos.zahtev.ZahtevDto;
+import com.project.dtos.zahtev.ZahtevRequestDto;
+import com.project.dtos.zahtev.ZahtevResponseDto;
 import com.project.serviceinterfaces.ZahtevService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,43 +22,58 @@ public class ZahtevController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ZahtevDto>> getAll() {
-        List<ZahtevDto> zahteviDto = zahtevService.findAll();
+    public ResponseEntity<List<ZahtevResponseDto>> getAll() {
+        try {
+            List<ZahtevResponseDto> zahteviDto = zahtevService.findAll();
 
-        return new ResponseEntity<>(zahteviDto, HttpStatus.OK);
+            return new ResponseEntity<>(zahteviDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     //Klijent ima pregled svojih zahteva
     @GetMapping("/allByClientEmail/{email}")
-    public ResponseEntity<List<ZahtevDto>> getAllMy(@PathVariable("email") String email) {
-        List<ZahtevDto> zahteviDto = zahtevService.findByClientsEmail(email);
+    public ResponseEntity<List<ZahtevResponseDto>> getAllByClientEmail(@PathVariable("email") String email) {
+        try {
+            List<ZahtevResponseDto> zahteviDto = zahtevService.findByClientsEmail(email);
 
-        return new ResponseEntity<>(zahteviDto, HttpStatus.OK);
+            return new ResponseEntity<>(zahteviDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     //Klijent kreira zahtev
     @PostMapping("/create/{email}")
-    public ResponseEntity<PostZahtevDto> create(@RequestBody PostZahtevDto postZahtevDto, @PathVariable("email") String email) {
-        PostZahtevDto zahtevDto = zahtevService.create(postZahtevDto, email);
+    public ResponseEntity<ZahtevRequestDto> create(@RequestBody ZahtevRequestDto zahtevRequestDto, @PathVariable("email") String email) {
+        try {
+            ZahtevRequestDto zahtevDto = zahtevService.create(zahtevRequestDto, email);
 
-        if (zahtevDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if (zahtevDto == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(zahtevDto, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(zahtevDto, HttpStatus.CREATED);
     }
 
     //Operater donosi odluku o zahtevu
     @PutMapping("/decide/{brojRacuna}/{decision}")
-    public ResponseEntity<ZahtevDto> decide(@PathVariable("brojRacuna") String brojRacuna, @PathVariable("decision") String decision) {
-        ZahtevDto zahtevDto = zahtevService.decide(brojRacuna, decision);
+    public ResponseEntity<ZahtevResponseDto> decide(@PathVariable("brojRacuna") String brojRacuna, @PathVariable("decision") String decision) {
+        try {
+            ZahtevResponseDto zahtevResponseDto = zahtevService.decide(brojRacuna, decision);
 
-        if (zahtevDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if (zahtevResponseDto == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(zahtevResponseDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(zahtevDto, HttpStatus.OK);
-
     }
 
 }

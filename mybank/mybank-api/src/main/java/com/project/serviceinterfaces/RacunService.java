@@ -1,11 +1,11 @@
 package com.project.serviceinterfaces;
 
-import com.project.dtos.racun.RacunDto;
+import com.project.dtos.racun.RacunResponseDto;
 
 import java.util.List;
 
 public interface RacunService {
-    List<RacunDto> findAll();
+    List<RacunResponseDto> findAll();
 
-
+    List<RacunResponseDto> findByClientsEmail(String email);
 }

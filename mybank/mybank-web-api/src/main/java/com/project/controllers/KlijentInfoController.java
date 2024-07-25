@@ -1,6 +1,6 @@
 package com.project.controllers;
 
-import com.project.dtos.klijentInfo.KlijentInfoDto;
+import com.project.dtos.klijentInfo.KlijentInfoResponseDto;
 import com.project.serviceinterfaces.KlijentInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,28 +21,28 @@ public class KlijentInfoController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<KlijentInfoDto>> findAll() {
-        List<KlijentInfoDto> klijentInfoDtos = klijentInfoService.findAll();
+    public ResponseEntity<List<KlijentInfoResponseDto>> findAll() {
+        try {
+            List<KlijentInfoResponseDto> klijentInfoResponseDtos = klijentInfoService.findAll();
 
-        return new ResponseEntity<>(klijentInfoDtos, HttpStatus.OK);
+            return new ResponseEntity<>(klijentInfoResponseDtos, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/find/{jmbg}")
-    public ResponseEntity<KlijentInfoDto> findByJmbg(@PathVariable("jmbg") String jmbg) {
-        KlijentInfoDto klijentInfoDto = klijentInfoService.findOneByJmbg(jmbg);
-        if (klijentInfoDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<KlijentInfoResponseDto> findByJmbg(@PathVariable("jmbg") String jmbg) {
+        try {
+            KlijentInfoResponseDto klijentInfoResponseDto = klijentInfoService.findOneByJmbg(jmbg);
+
+            if (klijentInfoResponseDto == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(klijentInfoResponseDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(klijentInfoDto, HttpStatus.OK);
     }
-
-    @PostMapping("/create")
-    public ResponseEntity<KlijentInfoDto> create(@RequestBody KlijentInfoDto klijentInfoDto) {
-        KlijentInfoDto klijentInfo = klijentInfoService.create(klijentInfoDto);
-
-        return new ResponseEntity<>(klijentInfo, HttpStatus.CREATED);
-    }
-
-
 }

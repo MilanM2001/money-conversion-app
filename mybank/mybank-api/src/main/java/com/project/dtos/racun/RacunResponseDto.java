@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RacunDto {
+public class RacunResponseDto {
     private Integer id;
     private String nazivBanke;
     private TipRacuna tipRacuna;

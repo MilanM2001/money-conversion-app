@@ -2,14 +2,14 @@ package com.project.services;
 
 import com.project.domain.entities.Adresa;
 import com.project.domain.repositoryinterfaces.AdresaRepository;
-import com.project.dtos.adresa.AdresaDto;
+import com.project.dtos.adresa.AdresaRequestDto;
+import com.project.dtos.adresa.AdresaResponseDto;
 import com.project.serviceinterfaces.AdresaService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,28 +26,28 @@ public class AdresaServiceImpl implements AdresaService {
 
 
     @Override
-    public List<AdresaDto> findAll() {
+    public List<AdresaResponseDto> findAll() {
         List<Adresa> adrese = adresaRepository.findAll();
-        List<AdresaDto> adreseDto = modelMapper.map(adrese, new TypeToken<List<AdresaDto>>() {}.getType());
+        List<AdresaResponseDto> adreseDto = modelMapper.map(adrese, new TypeToken<List<AdresaResponseDto>>() {}.getType());
 
         return adreseDto;
     }
 
     @Override
-    public AdresaDto findOneById(Integer id) {
+    public AdresaResponseDto findOneById(Integer id) {
         Adresa adresa = adresaRepository.findOneById(id);
         if (adresa == null) {
             return null;
         }
-        AdresaDto adresaDto = modelMapper.map(adresa, AdresaDto.class);
+        AdresaResponseDto adresaResponseDto = modelMapper.map(adresa, AdresaResponseDto.class);
 
-        return adresaDto;
+        return adresaResponseDto;
     }
 
     @Override
-    public AdresaDto create(AdresaDto adresaDto) {
-        Adresa adresa = modelMapper.map(adresaDto, Adresa.class);
-        adresa = adresaRepository.save(adresa);
-        return adresaDto;
+    public AdresaRequestDto create(AdresaRequestDto adresaRequestDto) {
+        Adresa adresa = modelMapper.map(adresaRequestDto, Adresa.class);
+        adresaRepository.save(adresa);
+        return adresaRequestDto;
     }
 }

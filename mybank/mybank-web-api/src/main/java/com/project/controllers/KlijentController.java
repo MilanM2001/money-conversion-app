@@ -25,26 +25,28 @@ public class KlijentController {
 
     @GetMapping("/all")
     public ResponseEntity<List<KlijentDto>> findAll() {
-        List<KlijentDto> klijentiDto = klijentService.findAll();
+        try {
+            List<KlijentDto> klijentiDto = klijentService.findAll();
 
-        return new ResponseEntity<>(klijentiDto, HttpStatus.OK);
+            return new ResponseEntity<>(klijentiDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/find/{email}")
     public ResponseEntity<KlijentDto> findById(@PathVariable("email") String email) {
-        KlijentDto klijentDto = klijentService.findOneByEmail(email);
-        if (klijentDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            KlijentDto klijentDto = klijentService.findOneByEmail(email);
+
+            if (klijentDto == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(klijentDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(klijentDto, HttpStatus.OK);
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<KlijentDto> create(@RequestBody KlijentDto klijentDto) {
-        KlijentDto klijent = klijentService.create(klijentDto);
-
-        return new ResponseEntity<>(klijent, HttpStatus.CREATED);
     }
 
 }

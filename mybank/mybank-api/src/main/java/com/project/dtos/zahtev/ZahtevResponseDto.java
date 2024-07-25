@@ -10,12 +10,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ZahtevDto {
+public class ZahtevResponseDto {
     private String brojZahteva;
     private TipZahteva tipZahteva;
     private TipRacuna tipRacuna;

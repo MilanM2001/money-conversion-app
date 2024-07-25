@@ -20,18 +20,15 @@ import java.util.Date;
 public class Racun {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "broj_racuna", nullable = false, unique = true)
+    private String brojRacuna;
 
     @Column(name = "naziv_banke", nullable = false)
     private String nazivBanke;
 
     @Column(name = "tip_racuna", nullable = false)
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private TipRacuna tipRacuna;
-
-    @Column(name = "broj_racuna", nullable = false)
-    private String brojRacuna;
 
     @Column(name = "trenutni_iznos", nullable = false)
     private int trenutniIznos;
@@ -40,11 +37,11 @@ public class Racun {
     private int kreditniLimit;
 
     @Column(name = "valuta", nullable = false)
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private Valuta valuta;
 
     @Column(name = "status_racuna", nullable = false)
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private StatusRacuna statusRacuna;
 
     @Column(name = "datum_kreiranja", nullable = false)

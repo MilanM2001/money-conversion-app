@@ -1,9 +1,10 @@
 package com.project.controllers;
 
 import com.project.dtos.klijent.KlijentDto;
-import com.project.dtos.klijentInfo.KlijentInfoDto;
+import com.project.dtos.klijentInfo.KlijentInfoRequestDto;
 import com.project.dtos.klijentInfo.UpdateKlijentInfoDto;
-import com.project.dtos.operater.OperaterDto;
+import com.project.dtos.operater.OperaterRequestDto;
+import com.project.dtos.operater.OperaterResponseDto;
 import com.project.exceptions.ClientAlreadyExistsException;
 import com.project.exceptions.ClientInfoNotFoundException;
 import com.project.serviceinterfaces.KlijentInfoService;
@@ -32,49 +33,60 @@ public class OperaterController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<OperaterDto>> findAll() {
-        List<OperaterDto> operateriDto = operaterService.findAll();
+    public ResponseEntity<List<OperaterResponseDto>> findAll() {
+        try {
+            List<OperaterResponseDto> operateriDto = operaterService.findAll();
 
-        return new ResponseEntity<>(operateriDto, HttpStatus.OK);
+            return new ResponseEntity<>(operateriDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/find/{email}")
-    public ResponseEntity<OperaterDto> findByEmail(@PathVariable("email") String email) {
-        OperaterDto operaterDto = operaterService.findOneByEmail(email);
-        if (operaterDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<OperaterResponseDto> findByEmail(@PathVariable("email") String email) {
+        try {
+            OperaterResponseDto operaterResponseDto = operaterService.findOneByEmail(email);
+            if (operaterResponseDto == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
 
-        return new ResponseEntity<>(operaterDto, HttpStatus.OK);
+            return new ResponseEntity<>(operaterResponseDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     //Kreiranje operatera
     @PostMapping("/create")
-    public ResponseEntity<OperaterDto> create(@RequestBody OperaterDto operaterDto) {
-        OperaterDto operater = operaterService.create(operaterDto);
+    public ResponseEntity<OperaterRequestDto> create(@RequestBody OperaterRequestDto operaterRequestDto) {
+        try {
+            OperaterRequestDto operater = operaterService.create(operaterRequestDto);
 
-        if (operater == null) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            if (operater == null) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+
+            return new ResponseEntity<>(operater, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(operater, HttpStatus.CREATED);
     }
 
-    //Operater kreira informacije o klijentu
     @PostMapping("/createClientInfo")
-    public ResponseEntity<KlijentInfoDto> createClientInfo(@RequestBody KlijentInfoDto klijentInfoDto) {
-        KlijentInfoDto klijentInfo = klijentInfoService.create(klijentInfoDto);
+    public ResponseEntity<KlijentInfoRequestDto> createClientInfo(@RequestBody KlijentInfoRequestDto klijentInfoRequestDto) {
+        try {
+            KlijentInfoRequestDto klijentInfo = klijentInfoService.create(klijentInfoRequestDto);
 
-        if (klijentInfo == null) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            if (klijentInfo == null) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+
+            return new ResponseEntity<>(klijentInfo, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(klijentInfo, HttpStatus.CREATED);
     }
-
-    //TODO:
-    //Different errors depending on the case that a client info does not exist
-    // or if a client already exists with the given JMBG
 
     //Operater kreira nalog klijenta
     @PostMapping("/createClient")
@@ -96,13 +108,15 @@ public class OperaterController {
     //Operater upravlja podacima klijenta
     @PutMapping("/updateClientInfo/{jmbg}")
     public ResponseEntity<UpdateKlijentInfoDto> updateClientInfo(@RequestBody UpdateKlijentInfoDto updateKlijentInfoDto, @PathVariable("jmbg") String jmbg) {
-        UpdateKlijentInfoDto updateKlijent = klijentInfoService.update(updateKlijentInfoDto, jmbg);
+        try {
+            UpdateKlijentInfoDto updateKlijent = klijentInfoService.update(updateKlijentInfoDto, jmbg);
 
-        if (updateKlijent == null) {
+            return new ResponseEntity<>(updateKlijent, HttpStatus.OK);
+        } catch (ClientInfoNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(updateKlijent, HttpStatus.OK);
     }
 
 

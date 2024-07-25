@@ -1,14 +1,14 @@
 package com.project.serviceinterfaces;
 
-import com.project.dtos.klijentInfo.KlijentInfoDto;
-import com.project.dtos.operater.OperaterDto;
+import com.project.dtos.operater.OperaterRequestDto;
+import com.project.dtos.operater.OperaterResponseDto;
 
 import java.util.List;
 
 public interface OperaterService {
-    List<OperaterDto> findAll();
+    List<OperaterResponseDto> findAll();
 
-    OperaterDto findOneByEmail(String email);
+    OperaterResponseDto findOneByEmail(String email);
 
-    OperaterDto create(OperaterDto operaterDto);
+    OperaterRequestDto create(OperaterRequestDto operaterRequestDto);
 }

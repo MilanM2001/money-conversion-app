@@ -1,7 +1,9 @@
 package com.project.controllers;
 
-import com.project.dtos.adresa.AdresaDto;
+import com.project.dtos.adresa.AdresaRequestDto;
+import com.project.dtos.adresa.AdresaResponseDto;
 import com.project.serviceinterfaces.AdresaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,27 +23,40 @@ public class AdresaController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<AdresaDto>> findAll() {
-        List<AdresaDto> adreseDtos = adresaService.findAll();
+    public ResponseEntity<List<AdresaResponseDto>> findAll() {
+        try {
+            List<AdresaResponseDto> adreseDtos = adresaService.findAll();
 
-        return new ResponseEntity<>(adreseDtos, HttpStatus.OK);
+            return new ResponseEntity<>(adreseDtos, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/find/{id}")
-    public ResponseEntity<AdresaDto> findById(@PathVariable("id") Integer id) {
-        AdresaDto adresaDto = adresaService.findOneById(id);
-        if (adresaDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<AdresaResponseDto> findById(@PathVariable("id") Integer id) {
+        try {
+            AdresaResponseDto adresaResponseDto = adresaService.findOneById(id);
 
-        return new ResponseEntity<>(adresaDto, HttpStatus.OK);
+            if (adresaResponseDto == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(adresaResponseDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/create")
-    public ResponseEntity<AdresaDto> create(@RequestBody AdresaDto adresaDto) {
-        AdresaDto adresa = adresaService.create(adresaDto);
+    public ResponseEntity<AdresaRequestDto> create(@RequestBody @Valid AdresaRequestDto adresaRequestDto) {
+        try {
+            AdresaRequestDto adresa = adresaService.create(adresaRequestDto);
 
-        return new ResponseEntity<>(adresa, HttpStatus.CREATED);
+            return new ResponseEntity<>(adresa, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

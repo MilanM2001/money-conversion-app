@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface ZahtevRepository extends JpaRepository<Zahtev, Integer> {
 
-    @Query(nativeQuery = true, value = "SELECT * FROM zahtevi where zahtevi.klijent_email = ?")
+    @Query(nativeQuery = true, value = "SELECT * FROM zahtevi WHERE zahtevi.klijent_email = ?")
     List<Zahtev> findByClientEmail(String klijentEmail);
 
     Zahtev findByBrojRacuna(String brojRacuna);

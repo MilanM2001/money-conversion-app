@@ -30,8 +30,4 @@ public class Adresa {
 
     @Column(name = "broj", nullable = false)
     private int broj;
-
-//    @OneToMany(mappedBy = "adresa", fetch = FetchType.EAGER)
-//    private List<KlijentInfo> klijenti;
-
 }

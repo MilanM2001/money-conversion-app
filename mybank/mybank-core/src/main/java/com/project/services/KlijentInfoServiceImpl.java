@@ -1,18 +1,18 @@
 package com.project.services;
 
-import com.project.domain.entities.Klijent;
 import com.project.domain.entities.KlijentInfo;
 import com.project.domain.repositoryinterfaces.KlijentInfoRepository;
 import com.project.domain.repositoryinterfaces.KlijentRepository;
-import com.project.dtos.klijentInfo.KlijentInfoDto;
+import com.project.dtos.klijentInfo.KlijentInfoRequestDto;
+import com.project.dtos.klijentInfo.KlijentInfoResponseDto;
 import com.project.dtos.klijentInfo.UpdateKlijentInfoDto;
+import com.project.exceptions.ClientInfoNotFoundException;
 import com.project.serviceinterfaces.KlijentInfoService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,32 +30,32 @@ public class KlijentInfoServiceImpl implements KlijentInfoService {
     }
 
     @Override
-    public List<KlijentInfoDto> findAll() {
+    public List<KlijentInfoResponseDto> findAll() {
         List<KlijentInfo> klijentInfos = klijentInfoRepository.findAll();
-        List<KlijentInfoDto> klijentInfoDtos = modelMapper.map(klijentInfos, new TypeToken<List<KlijentInfoDto>>() {}.getType());
-        return klijentInfoDtos;
+        List<KlijentInfoResponseDto> klijentInfoResponseDtos = modelMapper.map(klijentInfos, new TypeToken<List<KlijentInfoResponseDto>>() {}.getType());
+        return klijentInfoResponseDtos;
     }
 
     @Override
-    public KlijentInfoDto findOneByJmbg(String jmbg) {
+    public KlijentInfoResponseDto findOneByJmbg(String jmbg) {
         KlijentInfo klijentInfo = klijentInfoRepository.findOneByJmbg(jmbg);
         if (klijentInfo == null) {
             return null;
         }
-        KlijentInfoDto klijentInfoDto = modelMapper.map(klijentInfo, KlijentInfoDto.class);
-        return klijentInfoDto;
+        KlijentInfoResponseDto klijentInfoResponseDto = modelMapper.map(klijentInfo, KlijentInfoResponseDto.class);
+        return klijentInfoResponseDto;
     }
 
     @Override
-    public KlijentInfoDto create(KlijentInfoDto klijentInfoDto) {
+    public KlijentInfoRequestDto create(KlijentInfoRequestDto klijentInfoRequestDto) {
 
-        if (klijentInfoRepository.findOneByJmbg(klijentInfoDto.getJmbg()) != null) {
+        if (klijentInfoRepository.findOneByJmbg(klijentInfoRequestDto.getJmbg()) != null) {
             return null;
         }
 
-        KlijentInfo klijentInfo = modelMapper.map(klijentInfoDto, KlijentInfo.class);
-        klijentInfo = klijentInfoRepository.save(klijentInfo);
-        return klijentInfoDto;
+        KlijentInfo klijentInfo = modelMapper.map(klijentInfoRequestDto, KlijentInfo.class);
+        klijentInfoRepository.save(klijentInfo);
+        return klijentInfoRequestDto;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class KlijentInfoServiceImpl implements KlijentInfoService {
         KlijentInfo klijentInfo = klijentInfoRepository.findOneByJmbg(jmbg);
 
         if (klijentInfo == null) {
-            return null;
+            throw new ClientInfoNotFoundException("Client with the given jmbg does not exist: " + jmbg);
         }
 
         klijentInfo.setIme(updateKlijentInfoDto.getIme());
