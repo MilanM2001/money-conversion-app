@@ -1,12 +1,10 @@
 package com.project.controllers;
 
-import com.project.dtos.klijent.KlijentDto;
+import com.project.dtos.klijent.KlijentRequestDto;
 import com.project.dtos.klijentInfo.KlijentInfoRequestDto;
-import com.project.dtos.klijentInfo.UpdateKlijentInfoDto;
+import com.project.dtos.klijentInfo.KlijentInfoUpdateDto;
 import com.project.dtos.operater.OperaterRequestDto;
 import com.project.dtos.operater.OperaterResponseDto;
-import com.project.exceptions.ClientAlreadyExistsException;
-import com.project.exceptions.ClientInfoNotFoundException;
 import com.project.serviceinterfaces.KlijentInfoService;
 import com.project.serviceinterfaces.KlijentService;
 import com.project.serviceinterfaces.OperaterService;
@@ -73,6 +71,7 @@ public class OperaterController {
         }
     }
 
+    //Operater kreira informacije klijenta
     @PostMapping("/createClientInfo")
     public ResponseEntity<KlijentInfoRequestDto> createClientInfo(@RequestBody KlijentInfoRequestDto klijentInfoRequestDto) {
         try {
@@ -90,9 +89,9 @@ public class OperaterController {
 
     //Operater kreira nalog klijenta
     @PostMapping("/createClient")
-    public ResponseEntity<KlijentDto> createClient(@RequestBody KlijentDto klijentDto) {
+    public ResponseEntity<KlijentRequestDto> createClient(@RequestBody KlijentRequestDto klijentRequestDto) {
         try {
-            KlijentDto klijent = klijentService.create(klijentDto);
+            KlijentRequestDto klijent = klijentService.create(klijentRequestDto);
 
             return new ResponseEntity<>(klijent, HttpStatus.CREATED);
 
@@ -105,11 +104,11 @@ public class OperaterController {
         }
     }
 
-    //Operater upravlja podacima klijenta
+    //Operater upravlja/menja podacima klijenta
     @PutMapping("/updateClientInfo/{jmbg}")
-    public ResponseEntity<UpdateKlijentInfoDto> updateClientInfo(@RequestBody UpdateKlijentInfoDto updateKlijentInfoDto, @PathVariable("jmbg") String jmbg) {
+    public ResponseEntity<KlijentInfoUpdateDto> updateClientInfo(@RequestBody KlijentInfoUpdateDto klijentInfoUpdateDto, @PathVariable("jmbg") String jmbg) {
         try {
-            UpdateKlijentInfoDto updateKlijent = klijentInfoService.update(updateKlijentInfoDto, jmbg);
+            KlijentInfoUpdateDto updateKlijent = klijentInfoService.update(klijentInfoUpdateDto, jmbg);
 
             return new ResponseEntity<>(updateKlijent, HttpStatus.OK);
         } catch (ClientInfoNotFoundException e) {

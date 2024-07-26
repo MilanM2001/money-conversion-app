@@ -2,6 +2,7 @@ package com.project.controllers;
 
 import com.project.dtos.zahtev.ZahtevRequestDto;
 import com.project.dtos.zahtev.ZahtevResponseDto;
+import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.ZahtevService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ public class ZahtevController {
         this.zahtevService = zahtevService;
     }
 
+    //Operater ima pregled svih zahteva klijenata
     @GetMapping("/all")
     public ResponseEntity<List<ZahtevResponseDto>> getAll() {
         try {
@@ -44,17 +46,30 @@ public class ZahtevController {
         }
     }
 
-    //Klijent kreira zahtev
-    @PostMapping("/create/{email}")
-    public ResponseEntity<ZahtevRequestDto> create(@RequestBody ZahtevRequestDto zahtevRequestDto, @PathVariable("email") String email) {
+    //Klijent kreira zahtev za otvaranje racuna
+    @PostMapping("/open/{email}")
+    public ResponseEntity<ZahtevRequestDto> open(@RequestBody ZahtevRequestDto zahtevRequestDto, @PathVariable("email") String email) {
         try {
-            ZahtevRequestDto zahtevDto = zahtevService.create(zahtevRequestDto, email);
-
-            if (zahtevDto == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            ZahtevRequestDto zahtevDto = zahtevService.openRequest(zahtevRequestDto, email);
 
             return new ResponseEntity<>(zahtevDto, HttpStatus.CREATED);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //Klijent kreira zahtev za zatvaranje racuna
+    @PostMapping("/close/{email}/{brojRacuna}")
+    public ResponseEntity<ZahtevCloseRequestDto> close(@PathVariable("email") String email, @PathVariable("brojRacuna") String brojRacuna) {
+        try {
+            ZahtevResponseDto zahtevDto = zahtevService.closeRequest(email, brojRacuna);
+
+
+
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

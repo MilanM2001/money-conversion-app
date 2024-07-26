@@ -22,10 +22,8 @@ public class Zahtev {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @Column(name = "broj_zahteva", nullable = false)
-    private String brojZahteva;
+    @Column(name = "broj_zahteva", nullable = false, unique = true)
+    private Integer brojZahteva;
 
     @Column(name = "tip_zahteva", nullable = false)
     @Enumerated(value = EnumType.STRING)

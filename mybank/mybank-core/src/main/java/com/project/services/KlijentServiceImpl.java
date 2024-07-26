@@ -5,9 +5,10 @@ import com.project.domain.entities.KlijentInfo;
 import com.project.domain.repositoryinterfaces.KlijentInfoRepository;
 import com.project.domain.repositoryinterfaces.KlijentRepository;
 
-import com.project.dtos.klijent.KlijentDto;
-import com.project.exceptions.ClientAlreadyExistsException;
-import com.project.exceptions.ClientInfoNotFoundException;
+import com.project.dtos.klijent.KlijentResponseDto;
+import com.project.dtos.klijent.KlijentRequestDto;
+import com.project.exceptions.EntityAlreadyExistsException;
+import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.KlijentService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -32,43 +33,43 @@ public class KlijentServiceImpl implements KlijentService {
 
 
     @Override
-    public List<KlijentDto> findAll() {
+    public List<KlijentResponseDto> findAll() {
         List<Klijent> klijenti = klijentRepository.findAll();
-        List<KlijentDto> klijentiDto = modelMapper.map(klijenti, new TypeToken<List<KlijentDto>>() {}.getType());
+        List<KlijentResponseDto> klijentiDto = modelMapper.map(klijenti, new TypeToken<List<KlijentResponseDto>>() {}.getType());
         return klijentiDto;
     }
 
     @Override
-    public KlijentDto findOneByEmail(String email) {
+    public KlijentResponseDto findOneByEmail(String email) {
         Klijent klijent = klijentRepository.findOneByEmail(email);
         if (klijent == null) {
             return null;
         }
-        KlijentDto klijentDto = modelMapper.map(klijent, KlijentDto.class);
-        return klijentDto;
+        KlijentResponseDto klijentResponseDto = modelMapper.map(klijent, KlijentResponseDto.class);
+        return klijentResponseDto;
     }
 
     @Override
-    public KlijentDto create(KlijentDto klijentDto) {
+    public KlijentRequestDto create(KlijentRequestDto klijentRequestDto) {
 
-        //If Client Info with the given JMBG does not exist
-        if (klijentInfoRepository.findOneByJmbg(klijentDto.getJmbg()) == null) {
-            throw new ClientInfoNotFoundException("Client with the given jmbg does not exist: " + klijentDto.getJmbg());
+        //Throw exception if Client Info with the given JMBG does not exist
+        if (klijentInfoRepository.findOneByJmbg(klijentRequestDto.getJmbg()) == null) {
+            throw new EntityNotFoundException("Client with the given jmbg does not exist: " + klijentRequestDto.getJmbg());
         }
 
-        //If a Client already exists with the given email
-        if (klijentRepository.findOneByEmail(klijentDto.getEmail()) != null) {
-            throw new ClientAlreadyExistsException("Client with the given email already exists: " + klijentDto.getEmail());
+        //Throw exception if a Client already exists with the given email
+        if (klijentRepository.findOneByEmail(klijentRequestDto.getEmail()) != null) {
+            throw new EntityAlreadyExistsException("Client with the given email already exists: " + klijentRequestDto.getEmail());
         }
 
-        KlijentInfo klijentInfo = klijentInfoRepository.findOneByJmbg(klijentDto.getJmbg());
+        KlijentInfo klijentInfo = klijentInfoRepository.findOneByJmbg(klijentRequestDto.getJmbg());
         Klijent klijent = new Klijent();
 
         klijent.setKlijentInfo(klijentInfo);
-        klijent.setEmail(klijentDto.getEmail());
-        klijent.setPassword(klijentDto.getPassword());
+        klijent.setEmail(klijentRequestDto.getEmail());
+        klijent.setPassword(klijentRequestDto.getPassword());
 
         klijentRepository.save(klijent);
-        return klijentDto;
+        return klijentRequestDto;
     }
 }

@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ZahtevRequestDto {
-    @NotBlank(message = "Broj zahteva je obavezan")
-    private String brojZahteva;
 
     @NotBlank(message = "Tip racuna je obavezan")
     private TipRacuna tipRacuna;
@@ -22,4 +20,7 @@ public class ZahtevRequestDto {
 
     @NotBlank(message = "Broj racuna je obavezan")
     private String brojRacuna;
+
+    @NotBlank(message = "Kreditni limit je obavezan")
+    private int kreditniLimit;
 }

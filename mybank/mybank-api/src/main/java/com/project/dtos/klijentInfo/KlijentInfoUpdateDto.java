@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateKlijentInfoDto {
+public class KlijentInfoUpdateDto {
     private String ime;
     private String prezime;
     private String brojTelefona;

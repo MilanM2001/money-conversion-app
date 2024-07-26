@@ -1,6 +1,6 @@
 package com.project.dtos.racun;
 
-import com.project.dtos.klijent.KlijentDto;
+import com.project.dtos.klijent.KlijentResponseDto;
 import com.project.enums.StatusRacuna;
 import com.project.enums.TipRacuna;
 import com.project.enums.Valuta;
@@ -25,5 +25,5 @@ public class RacunResponseDto {
     private LocalDate datumKreiranja;
     private LocalDate datumPoslednjePromene;
     private String version;
-    private KlijentDto klijent;
+    private KlijentResponseDto klijent;
 }

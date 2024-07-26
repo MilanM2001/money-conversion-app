@@ -10,7 +10,9 @@ public interface ZahtevService {
 
     List<ZahtevResponseDto> findByClientsEmail(String email);
 
-    ZahtevRequestDto create(ZahtevRequestDto zahtevRequestDto, String email);
+    ZahtevRequestDto openRequest(ZahtevRequestDto zahtevRequestDto, String email);
+
+    ZahtevResponseDto closeRequest(String email, String brojRacuna);
 
     ZahtevResponseDto decide(String brojRacuna, String decision);
 }

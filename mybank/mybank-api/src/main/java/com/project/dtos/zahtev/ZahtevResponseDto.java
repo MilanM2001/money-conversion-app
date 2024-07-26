@@ -1,6 +1,6 @@
 package com.project.dtos.zahtev;
 
-import com.project.dtos.klijent.KlijentDto;
+import com.project.dtos.klijent.KlijentResponseDto;
 import com.project.enums.StatusZahteva;
 import com.project.enums.TipRacuna;
 import com.project.enums.TipZahteva;
@@ -22,7 +22,7 @@ public class ZahtevResponseDto {
     private int kreditniLimit;
     private String brojRacuna;
     private StatusZahteva statusZahteva;
-    private KlijentDto podnosilacZahteva;
+    private KlijentResponseDto podnosilacZahteva;
     private LocalDate datumZahteva;
     private LocalDate datumOdluke;
 }

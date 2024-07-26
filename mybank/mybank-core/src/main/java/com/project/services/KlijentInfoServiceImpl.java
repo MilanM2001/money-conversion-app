@@ -5,8 +5,7 @@ import com.project.domain.repositoryinterfaces.KlijentInfoRepository;
 import com.project.domain.repositoryinterfaces.KlijentRepository;
 import com.project.dtos.klijentInfo.KlijentInfoRequestDto;
 import com.project.dtos.klijentInfo.KlijentInfoResponseDto;
-import com.project.dtos.klijentInfo.UpdateKlijentInfoDto;
-import com.project.exceptions.ClientInfoNotFoundException;
+import com.project.dtos.klijentInfo.KlijentInfoUpdateDto;
 import com.project.serviceinterfaces.KlijentInfoService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -59,7 +58,7 @@ public class KlijentInfoServiceImpl implements KlijentInfoService {
     }
 
     @Override
-    public UpdateKlijentInfoDto update(UpdateKlijentInfoDto updateKlijentInfoDto, String jmbg) {
+    public KlijentInfoUpdateDto update(KlijentInfoUpdateDto klijentInfoUpdateDto, String jmbg) {
 
         KlijentInfo klijentInfo = klijentInfoRepository.findOneByJmbg(jmbg);
 
@@ -67,12 +66,12 @@ public class KlijentInfoServiceImpl implements KlijentInfoService {
             throw new ClientInfoNotFoundException("Client with the given jmbg does not exist: " + jmbg);
         }
 
-        klijentInfo.setIme(updateKlijentInfoDto.getIme());
-        klijentInfo.setPrezime(updateKlijentInfoDto.getPrezime());
-        klijentInfo.setBrojTelefona(updateKlijentInfoDto.getBrojTelefona());
+        klijentInfo.setIme(klijentInfoUpdateDto.getIme());
+        klijentInfo.setPrezime(klijentInfoUpdateDto.getPrezime());
+        klijentInfo.setBrojTelefona(klijentInfoUpdateDto.getBrojTelefona());
 
         klijentInfoRepository.save(klijentInfo);
 
-        return updateKlijentInfoDto;
+        return klijentInfoUpdateDto;
     }
 }

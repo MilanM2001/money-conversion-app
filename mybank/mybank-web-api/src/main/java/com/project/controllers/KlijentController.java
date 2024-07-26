@@ -2,7 +2,7 @@ package com.project.controllers;
 
 
 
-import com.project.dtos.klijent.KlijentDto;
+import com.project.dtos.klijent.KlijentResponseDto;
 import com.project.serviceinterfaces.KlijentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,9 +24,9 @@ public class KlijentController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<KlijentDto>> findAll() {
+    public ResponseEntity<List<KlijentResponseDto>> findAll() {
         try {
-            List<KlijentDto> klijentiDto = klijentService.findAll();
+            List<KlijentResponseDto> klijentiDto = klijentService.findAll();
 
             return new ResponseEntity<>(klijentiDto, HttpStatus.OK);
         } catch (Exception e) {
@@ -35,15 +35,15 @@ public class KlijentController {
     }
 
     @GetMapping("/find/{email}")
-    public ResponseEntity<KlijentDto> findById(@PathVariable("email") String email) {
+    public ResponseEntity<KlijentResponseDto> findById(@PathVariable("email") String email) {
         try {
-            KlijentDto klijentDto = klijentService.findOneByEmail(email);
+            KlijentResponseDto klijentResponseDto = klijentService.findOneByEmail(email);
 
-            if (klijentDto == null) {
+            if (klijentResponseDto == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            return new ResponseEntity<>(klijentDto, HttpStatus.OK);
+            return new ResponseEntity<>(klijentResponseDto, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
