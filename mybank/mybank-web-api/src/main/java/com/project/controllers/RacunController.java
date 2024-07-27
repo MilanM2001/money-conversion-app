@@ -1,14 +1,14 @@
 package com.project.controllers;
 
+import com.project.dtos.racun.RacunDepositDto;
 import com.project.dtos.racun.RacunResponseDto;
+import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.RacunService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class RacunController {
     }
 
     //Klijent ima pregled svojih racuna
-    @GetMapping("/allByCllientEmail/{email}")
+    @GetMapping("/allByClientEmail/{email}")
     public ResponseEntity<List<RacunResponseDto>> getAllByClientEmail(@PathVariable("email") String email) {
         try {
             List<RacunResponseDto> racuniDto = racunService.findByClientsEmail(email);
@@ -43,6 +43,18 @@ public class RacunController {
             return new ResponseEntity<>(racuniDto, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //Klijent moze da deponuje novac na racun
+    @PutMapping("/deposit/{brojRacuna}")
+    public ResponseEntity<RacunDepositDto> deposit(@RequestBody @Valid RacunDepositDto racunDepositDto, @PathVariable("brojRacuna") String brojRacuna) {
+        try {
+            RacunDepositDto racun = racunService.deposit(racunDepositDto, brojRacuna);
+
+            return new ResponseEntity<>(racun, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

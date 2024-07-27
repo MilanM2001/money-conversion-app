@@ -5,6 +5,8 @@ import com.project.dtos.klijentInfo.KlijentInfoRequestDto;
 import com.project.dtos.klijentInfo.KlijentInfoUpdateDto;
 import com.project.dtos.operater.OperaterRequestDto;
 import com.project.dtos.operater.OperaterResponseDto;
+import com.project.exceptions.EntityAlreadyExistsException;
+import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.KlijentInfoService;
 import com.project.serviceinterfaces.KlijentService;
 import com.project.serviceinterfaces.OperaterService;
@@ -95,9 +97,9 @@ public class OperaterController {
 
             return new ResponseEntity<>(klijent, HttpStatus.CREATED);
 
-        } catch (ClientInfoNotFoundException ex) {
+        } catch (EntityNotFoundException ex) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (ClientAlreadyExistsException ex) {
+        } catch (EntityAlreadyExistsException ex) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -111,7 +113,7 @@ public class OperaterController {
             KlijentInfoUpdateDto updateKlijent = klijentInfoService.update(klijentInfoUpdateDto, jmbg);
 
             return new ResponseEntity<>(updateKlijent, HttpStatus.OK);
-        } catch (ClientInfoNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

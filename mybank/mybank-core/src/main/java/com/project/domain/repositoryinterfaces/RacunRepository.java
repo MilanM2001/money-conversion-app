@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface RacunRepository extends JpaRepository<Racun, Integer> {
 
-    @Query(nativeQuery = true, value = "SELECT * FROM racuni WHERE racuni.klijent_email = ?")
+    @Query(nativeQuery = true, value = "SELECT * FROM racuni r WHERE r.klijent_email = ?")
     List<Racun> findByClientsEmail(String email);
 
     Racun findByBrojRacuna(String brojRacuna);

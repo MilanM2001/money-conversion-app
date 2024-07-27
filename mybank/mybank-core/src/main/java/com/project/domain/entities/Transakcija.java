@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -44,7 +45,7 @@ public class Transakcija {
     private int koeficijentKonverzije;
 
     @Column(name = "datum_transakcije", nullable = false)
-    private LocalDateTime datumTransakcije;
+    private LocalDate datumTransakcije;
 
     @ManyToOne(targetEntity = Klijent.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "klijent_email")

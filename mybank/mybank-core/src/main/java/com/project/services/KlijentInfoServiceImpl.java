@@ -6,6 +6,7 @@ import com.project.domain.repositoryinterfaces.KlijentRepository;
 import com.project.dtos.klijentInfo.KlijentInfoRequestDto;
 import com.project.dtos.klijentInfo.KlijentInfoResponseDto;
 import com.project.dtos.klijentInfo.KlijentInfoUpdateDto;
+import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.KlijentInfoService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -63,7 +64,7 @@ public class KlijentInfoServiceImpl implements KlijentInfoService {
         KlijentInfo klijentInfo = klijentInfoRepository.findOneByJmbg(jmbg);
 
         if (klijentInfo == null) {
-            throw new ClientInfoNotFoundException("Client with the given jmbg does not exist: " + jmbg);
+            throw new EntityNotFoundException("Client with the given jmbg does not exist: " + jmbg);
         }
 
         klijentInfo.setIme(klijentInfoUpdateDto.getIme());

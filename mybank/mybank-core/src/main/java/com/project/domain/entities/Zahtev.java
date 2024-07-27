@@ -40,7 +40,7 @@ public class Zahtev {
     @Column(name = "kreditni_limit", nullable = false)
     private int kreditniLimit;
 
-    @Column(name = "broj_racuna", unique = true, nullable = false)
+    @Column(name = "broj_racuna", nullable = false)
     private String brojRacuna;
 
     @Column(name = "status_zahteva", nullable = false)

@@ -8,6 +8,8 @@ import java.util.List;
 public interface ZahtevService {
     List<ZahtevResponseDto> findAll();
 
+    List<ZahtevResponseDto> findAllNonDecided();
+
     List<ZahtevResponseDto> findByClientsEmail(String email);
 
     ZahtevRequestDto openRequest(ZahtevRequestDto zahtevRequestDto, String email);

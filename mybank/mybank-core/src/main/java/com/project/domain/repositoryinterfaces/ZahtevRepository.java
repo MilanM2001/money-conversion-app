@@ -14,4 +14,10 @@ public interface ZahtevRepository extends JpaRepository<Zahtev, Integer> {
     List<Zahtev> findByClientEmail(String klijentEmail);
 
     Zahtev findByBrojRacuna(String brojRacuna);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM zahtevi z WHERE z.broj_racuna = ? AND z.status_zahteva = 'KREIRAN'")
+    Zahtev findKreiranByBrojRacuna(String brojRacuna);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM zahtevi z WHERE z.status_zahteva = 'KREIRAN'")
+    List<Zahtev> findAllNonDecided();
 }

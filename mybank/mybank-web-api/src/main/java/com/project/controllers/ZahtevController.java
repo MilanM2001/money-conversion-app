@@ -2,6 +2,7 @@ package com.project.controllers;
 
 import com.project.dtos.zahtev.ZahtevRequestDto;
 import com.project.dtos.zahtev.ZahtevResponseDto;
+import com.project.exceptions.EntityAlreadyExistsException;
 import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.ZahtevService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class ZahtevController {
 
     //Operater ima pregled svih zahteva klijenata
     @GetMapping("/all")
-    public ResponseEntity<List<ZahtevResponseDto>> getAll() {
+    public ResponseEntity<List<ZahtevResponseDto>> findAll() {
         try {
             List<ZahtevResponseDto> zahteviDto = zahtevService.findAll();
 
@@ -34,9 +35,21 @@ public class ZahtevController {
         }
     }
 
+    //Operater ima pregled zahteva na cekanju
+    @GetMapping("/allNonDecided")
+    public ResponseEntity<List<ZahtevResponseDto>> findAllNonDecided() {
+        try {
+            List<ZahtevResponseDto> zahteviDto = zahtevService.findAllNonDecided();
+
+            return new ResponseEntity<>(zahteviDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     //Klijent ima pregled svojih zahteva
     @GetMapping("/allByClientEmail/{email}")
-    public ResponseEntity<List<ZahtevResponseDto>> getAllByClientEmail(@PathVariable("email") String email) {
+    public ResponseEntity<List<ZahtevResponseDto>> findAllByClientEmail(@PathVariable("email") String email) {
         try {
             List<ZahtevResponseDto> zahteviDto = zahtevService.findByClientsEmail(email);
 
@@ -55,6 +68,8 @@ public class ZahtevController {
             return new ResponseEntity<>(zahtevDto, HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (EntityAlreadyExistsException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -62,12 +77,15 @@ public class ZahtevController {
 
     //Klijent kreira zahtev za zatvaranje racuna
     @PostMapping("/close/{email}/{brojRacuna}")
-    public ResponseEntity<ZahtevCloseRequestDto> close(@PathVariable("email") String email, @PathVariable("brojRacuna") String brojRacuna) {
+    public ResponseEntity<ZahtevResponseDto> close(@PathVariable("email") String email, @PathVariable("brojRacuna") String brojRacuna) {
         try {
             ZahtevResponseDto zahtevDto = zahtevService.closeRequest(email, brojRacuna);
 
+            if (zahtevDto == null) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
 
-
+            return new ResponseEntity<>(zahtevDto, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -81,11 +99,9 @@ public class ZahtevController {
         try {
             ZahtevResponseDto zahtevResponseDto = zahtevService.decide(brojRacuna, decision);
 
-            if (zahtevResponseDto == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
             return new ResponseEntity<>(zahtevResponseDto, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

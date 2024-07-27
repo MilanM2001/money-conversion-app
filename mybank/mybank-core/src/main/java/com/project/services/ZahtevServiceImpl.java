@@ -12,6 +12,7 @@ import com.project.enums.StatusRacuna;
 import com.project.enums.StatusZahteva;
 import com.project.enums.TipRacuna;
 import com.project.enums.TipZahteva;
+import com.project.exceptions.EntityAlreadyExistsException;
 import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.ZahtevService;
 import org.modelmapper.ModelMapper;
@@ -51,6 +52,14 @@ public class ZahtevServiceImpl implements ZahtevService {
     }
 
     @Override
+    public List<ZahtevResponseDto> findAllNonDecided() {
+        List<Zahtev> zahtevi = zahtevRepository.findAllNonDecided();
+        List<ZahtevResponseDto> zahteviDto = modelMapper.map(zahtevi, new TypeToken<List<ZahtevResponseDto>>() {}.getType());
+
+        return zahteviDto;
+    }
+
+    @Override
     public List<ZahtevResponseDto> findByClientsEmail(String email) {
         List<Zahtev> zahtevi = zahtevRepository.findByClientEmail(email);
         List<ZahtevResponseDto> zahteviDto = modelMapper.map(zahtevi, new TypeToken<List<ZahtevResponseDto>>() {}.getType());
@@ -60,8 +69,13 @@ public class ZahtevServiceImpl implements ZahtevService {
 
     @Override
     public ZahtevRequestDto openRequest(ZahtevRequestDto zahtevRequestDto, String email) {
-
         Klijent klijent = klijentRepository.findOneByEmail(email);
+
+        Racun racun = racunRepository.findByBrojRacuna(zahtevRequestDto.getBrojRacuna());
+
+        if (racun != null) {
+            throw new EntityAlreadyExistsException("Racun with the given broj racuna already exists: " + zahtevRequestDto.getBrojRacuna());
+        }
 
         if (klijent == null) {
             throw new EntityNotFoundException("Client with the given email does not exist: " + email);
@@ -85,8 +99,6 @@ public class ZahtevServiceImpl implements ZahtevService {
     }
 
     //Klijent pravi zahtev za zatvaranje racuna
-    //TODO
-    //Zahtev ne moze da se napravi ako iznos na racunu nije 0
     @Override
     public ZahtevResponseDto closeRequest(String email, String brojRacuna) {
         Klijent klijent = klijentRepository.findOneByEmail(email);
@@ -124,11 +136,11 @@ public class ZahtevServiceImpl implements ZahtevService {
         return zahtevDto;
     }
 
-    //Operater donosi odluku o zahtevu za zatvaranje ili otvaranje racuna
+    //Operater donosi odluku o klijentovom zahtevu za zatvaranje ili otvaranje racuna,
+    //zahtev mora biti statusa 'KREIRAN'
     @Override
     public ZahtevResponseDto decide(String brojRacuna, String decision) {
-        Zahtev zahtev = zahtevRepository.findByBrojRacuna(brojRacuna);
-        ZahtevResponseDto zahtevResponseDto = modelMapper.map(zahtev, ZahtevResponseDto.class);
+        Zahtev zahtev = zahtevRepository.findKreiranByBrojRacuna(brojRacuna);
 
         if (zahtev == null) {
             throw new EntityNotFoundException("Zahtev with the given broj racuna does not exist: " + brojRacuna);
@@ -190,6 +202,7 @@ public class ZahtevServiceImpl implements ZahtevService {
             }
         }
 
-        return zahtevResponseDto;
+        return modelMapper.map(zahtev, ZahtevResponseDto.class);
     }
+
 }
