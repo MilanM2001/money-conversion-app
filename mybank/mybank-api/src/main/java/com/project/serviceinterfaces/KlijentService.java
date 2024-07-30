@@ -13,4 +13,6 @@ public interface KlijentService {
     KlijentResponseDto findOneByEmail(String email);
 
     KlijentRequestDto create(KlijentRequestDto klijentRequestDto);
+
+    void deleteByJMBG(String jmbg);
 }

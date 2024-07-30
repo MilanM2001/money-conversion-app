@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TranskacijaResponseDto {
+public class TransakcijaResponseDto {
     private Integer id;
     private TipTransakcije tipTransakcije;
     private int iznos;

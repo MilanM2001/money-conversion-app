@@ -14,7 +14,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RacunResponseDto {
-    private Integer id;
     private String nazivBanke;
     private TipRacuna tipRacuna;
     private String brojRacuna;

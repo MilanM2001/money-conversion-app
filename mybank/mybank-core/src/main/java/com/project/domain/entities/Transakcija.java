@@ -52,6 +52,6 @@ public class Transakcija {
     private Klijent klijentEmail;
 
     @Column(name = "status_transakcije", nullable = false)
+    @Enumerated(EnumType.STRING)
     private StatusTransakcije statusTransakcije;
-
 }

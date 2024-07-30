@@ -4,14 +4,21 @@ import com.project.domain.entities.Racun;
 import com.project.domain.repositoryinterfaces.RacunRepository;
 import com.project.dtos.racun.RacunDepositDto;
 import com.project.dtos.racun.RacunResponseDto;
+import com.project.dtos.racun.RacunWithdrawDto;
+import com.project.enums.StatusRacuna;
 import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.RacunService;
+import jakarta.persistence.criteria.Predicate;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RacunServiceImpl implements RacunService {
@@ -34,6 +41,34 @@ public class RacunServiceImpl implements RacunService {
     }
 
     @Override
+    public List<RacunResponseDto> findAllFiltered(String klijentEmail, String statusRacuna, LocalDate datumPoslednjePromene) {
+        List<Racun> filteredRacuni = racunRepository.findAll((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (klijentEmail != null && !klijentEmail.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("klijent").get("email"), klijentEmail));
+            }
+            if (statusRacuna != null && !statusRacuna.isEmpty()) {
+                try {
+                    StatusRacuna status = StatusRacuna.valueOf(statusRacuna.toUpperCase());
+                    predicates.add(criteriaBuilder.equal(root.get("statusRacuna"), status));
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("Invalid statusRacuna value: " + statusRacuna, e);
+                }
+            }
+            if (datumPoslednjePromene != null) {
+                predicates.add(criteriaBuilder.equal(root.get("datumPoslednjePromene"), datumPoslednjePromene));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        });
+
+        return filteredRacuni.stream()
+                .map(racun -> modelMapper.map(racun, RacunResponseDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<RacunResponseDto> findByClientsEmail(String email) {
         List<Racun> racuni = racunRepository.findByClientsEmail(email);
         List<RacunResponseDto> racuniDto = modelMapper.map(racuni, new TypeToken<List<RacunResponseDto>>() {}.getType());
@@ -41,9 +76,6 @@ public class RacunServiceImpl implements RacunService {
         return racuniDto;
     }
 
-
-    //TODO
-    //Proveriti da li je racun aktivan i da li pripada osobi koja deponuje
     @Override
     public RacunDepositDto deposit(RacunDepositDto racunDepositDto, String brojRacuna) {
         Racun racun = racunRepository.findByBrojRacuna(brojRacuna);
@@ -52,9 +84,39 @@ public class RacunServiceImpl implements RacunService {
             throw new EntityNotFoundException("Racun with the provided broj racuna does not exist: " + brojRacuna);
         }
 
+        if (racun.getStatusRacuna().equals(StatusRacuna.AKTIVAN) || racun.getStatusRacuna().equals(StatusRacuna.KREIRAN)) {
+            return null;
+        }
+
         racun.setTrenutniIznos(+racunDepositDto.getIznos());
         racunRepository.save(racun);
 
         return racunDepositDto;
+    }
+
+    @Override
+    public RacunWithdrawDto withdraw(RacunWithdrawDto racunWithdrawDto, String brojRacuna) {
+        Racun racun = racunRepository.findByBrojRacuna(brojRacuna);
+
+        if (racun == null) {
+            throw new EntityNotFoundException("Racun with the provided broj racuna does not exist: " + brojRacuna);
+        }
+
+        if (racun.getStatusRacuna().equals(StatusRacuna.NEAKTIVAN) || racun.getStatusRacuna().equals(StatusRacuna.ZATVOREN)) {
+            return null;
+        }
+
+        int iznos = racunWithdrawDto.getIznos();
+        int trenutnoStanje = racun.getTrenutniIznos();
+        int novoStanje = trenutnoStanje - iznos;
+
+        if (novoStanje < 0) {
+            return null;
+        }
+
+        racun.setTrenutniIznos(novoStanje);
+        racunRepository.save(racun);
+
+        return racunWithdrawDto;
     }
 }
