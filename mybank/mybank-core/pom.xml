@@ -7,10 +7,10 @@
 		<artifactId>mybank</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
+
 	<artifactId>mybank-core</artifactId>
 
 	<name>mybank-core</name>
-	<description>My Bank service</description>
 
 	<dependencies>
 		<dependency>
@@ -23,7 +23,6 @@
 			<artifactId>mybank-shared</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-
 	</dependencies>
 
 </project>

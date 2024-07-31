@@ -7,12 +7,14 @@
 		<artifactId>mybank</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
+
 	<artifactId>mybank-app</artifactId>
 	<name>mybank-app</name>
-	<description>My Bank service</description>
+
 	<properties>
 		<java.version>22</java.version>
 	</properties>
+
 	<dependencies>
 
 		<dependency>
@@ -50,14 +52,5 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>

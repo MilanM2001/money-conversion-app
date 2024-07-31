@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.project</groupId>
-        <artifactId>mybank</artifactId>
+        <artifactId>myExchange</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mybank-shared</artifactId>
+    <artifactId>myexchange-shared</artifactId>
 
-    <name>mybank-shared</name>
+    <name>myexchange-shared</name>
 
     <dependencies>
 

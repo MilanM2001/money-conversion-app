@@ -4,19 +4,19 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.project</groupId>
-	<artifactId>mybank</artifactId>
+	<artifactId>myExchange</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>mybank</name>
-	<description>My Bank Application</description>
+    <name>myExchange</name>
+	<description>My Exchange Application</description>
 
 	<packaging>pom</packaging>
 
-	<modules>
-		<module>mybank-core</module>
-		<module>mybank-app</module>
-        <module>mybank-api</module>
-		<module>mybank-web-api</module>
-		<module>mybank-shared</module>
+    <modules>
+		<module>myexchange-api</module>
+		<module>myexchange-app</module>
+        <module>myexchange-core</module>
+        <module>myexchange-web-api</module>
+        <module>myexchange-shared</module>
     </modules>
 
 	<properties>

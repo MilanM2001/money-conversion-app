@@ -3,18 +3,23 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.project</groupId>
-        <artifactId>mybank</artifactId>
+        <artifactId>myExchange</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mybank-api</artifactId>
+    <artifactId>myexchange-core</artifactId>
 
-    <name>mybank-api</name>
+    <name>myexchange-core</name>
 
     <dependencies>
         <dependency>
             <groupId>com.project</groupId>
-            <artifactId>mybank-shared</artifactId>
+            <artifactId>myexchange-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.project</groupId>
+            <artifactId>myexchange-shared</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
