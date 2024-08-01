@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 public class KlijentInfoServiceImpl implements KlijentInfoService {
 
-    private final KlijentRepository klijentRepository;
+    KlijentRepository klijentRepository;
     KlijentInfoRepository klijentInfoRepository;
     ModelMapper modelMapper;
 

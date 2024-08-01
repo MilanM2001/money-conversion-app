@@ -11,8 +11,6 @@
 
     <name>mybank-web-api</name>
 
-
-
     <dependencies>
         <dependency>
             <groupId>com.project</groupId>
