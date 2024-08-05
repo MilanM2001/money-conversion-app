@@ -5,13 +5,15 @@ import com.project.domain.entities.Racun;
 import com.project.domain.entities.Transakcija;
 import com.project.domain.repositoryinterfaces.KlijentRepository;
 import com.project.domain.repositoryinterfaces.RacunRepository;
-import com.project.domain.repositoryinterfaces.TranskacijaRepository;
+import com.project.domain.repositoryinterfaces.TransakcijaRepository;
 import com.project.dtos.transakcija.TransakcijaRequestDto;
 import com.project.dtos.transakcija.TransakcijaResponseDto;
 import com.project.enums.StatusRacuna;
 import com.project.enums.StatusTransakcije;
 import com.project.enums.TipTransakcije;
 import com.project.exceptions.EntityNotFoundException;
+import com.project.exceptions.NegativeBalanceException;
+import com.project.exceptions.RacunClosedException;
 import com.project.serviceinterfaces.TransakcijaService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -23,16 +25,16 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-public class TranskacijaServiceImpl implements TransakcijaService {
+public class TransakcijaServiceImpl implements TransakcijaService {
 
     KlijentRepository klijentRepository;
     RacunRepository racunRepository;
-    TranskacijaRepository transkacijaRepository;
+    TransakcijaRepository transakcijaRepository;
     ModelMapper modelMapper;
 
     @Autowired
-    public TranskacijaServiceImpl(TranskacijaRepository transkacijaRepository, ModelMapper modelMapper, KlijentRepository klijentRepository, RacunRepository racunRepository) {
-        this.transkacijaRepository = transkacijaRepository;
+    public TransakcijaServiceImpl(TransakcijaRepository transakcijaRepository, ModelMapper modelMapper, KlijentRepository klijentRepository, RacunRepository racunRepository) {
+        this.transakcijaRepository = transakcijaRepository;
         this.modelMapper = modelMapper;
         this.klijentRepository = klijentRepository;
         this.racunRepository = racunRepository;
@@ -40,7 +42,7 @@ public class TranskacijaServiceImpl implements TransakcijaService {
 
     @Override
     public List<TransakcijaResponseDto> findAll() {
-        List<Transakcija> transakcije = transkacijaRepository.findAll();
+        List<Transakcija> transakcije = transakcijaRepository.findAll();
         List<TransakcijaResponseDto> transakcijeDto = modelMapper.map(transakcije, new TypeToken<List<TransakcijaResponseDto>>() {}.getType());
 
         return transakcijeDto;
@@ -52,7 +54,7 @@ public class TranskacijaServiceImpl implements TransakcijaService {
             throw new EntityNotFoundException("Cannot find klijent with the given email: " + email);
         }
 
-        List<Transakcija> transakcije = transkacijaRepository.findAllByKlijentEmail(email);
+        List<Transakcija> transakcije = transakcijaRepository.findAllByKlijentEmail(email);
         List<TransakcijaResponseDto> transkacijeDto = modelMapper.map(transakcije, new TypeToken<List<TransakcijaResponseDto>>() {}.getType());
 
         return transkacijeDto;
@@ -62,34 +64,53 @@ public class TranskacijaServiceImpl implements TransakcijaService {
     public List<TransakcijaResponseDto> findAllByKlijentEmail(String email, String sortBy) {
         Sort sort = getSortByParameter(sortBy);
         Klijent klijent = klijentRepository.findOneByEmail(email);
-        List<Transakcija> transakcije = transkacijaRepository.findAllByKlijentEmail(klijent, sort);
+        List<Transakcija> transakcije = transakcijaRepository.findAllByKlijentEmail(klijent, sort);
         List<TransakcijaResponseDto> transakcijeDto = modelMapper.map(transakcije, new TypeToken<List<TransakcijaResponseDto>>() {}.getType());
 
         return transakcijeDto;
     }
 
-    //TODO
-    //Proveriti i uporediti valute racuna uplate i transakcije i onda kasnije konvertovati ako treba
+
+
+    //Glavna metoda za transkaciju, na osnovu tipa transkacije radi se dalja logika
     @Override
-    public TransakcijaRequestDto deposit(TransakcijaRequestDto transakcijaDto, String klijentEmail, String brojRacunaUplate) {
-        Racun racunUplate = racunRepository.findByBrojRacuna(brojRacunaUplate);
+    public TransakcijaResponseDto transakcija(TransakcijaRequestDto transakcijaRequestDto, String klijentEmail, String brojRacunaUplate, String brojRacunaIsplate) {
         Klijent klijent = klijentRepository.findOneByEmail(klijentEmail);
 
-        if (racunUplate == null) {
-            throw new EntityNotFoundException("Racun with the provided broj does not exist: " + brojRacunaUplate);
-        } else if (klijent == null) {
+        if (klijent == null) {
             throw new EntityNotFoundException("Klijent with the provided email does not exist: " + klijentEmail);
         }
 
-        if (!racunUplate.getStatusRacuna().equals(StatusRacuna.AKTIVAN)) {
-            return null;
+        TipTransakcije tipTranskacije = transakcijaRequestDto.getTipTransakcije();
+
+        if (tipTranskacije == TipTransakcije.UPLATA) {
+            TransakcijaResponseDto transakcijaResponseDto = deposit(transakcijaRequestDto, klijent, brojRacunaUplate);
+
+            return transakcijaResponseDto;
+        } else if (tipTranskacije == TipTransakcije.ISPLATA) {
+            TransakcijaResponseDto transakcijaResponseDto = withdraw(transakcijaRequestDto, klijent, brojRacunaIsplate);
+
+        } else if (tipTranskacije == TipTransakcije.PRENOS) {
+
         }
+
+        return null;
+    }
+
+
+
+
+
+    //TODO
+    //Proveriti i uporediti valute racuna uplate i transakcije i onda kasnije konvertovati ako treba
+    private TransakcijaResponseDto deposit(TransakcijaRequestDto transakcijaRequestDto, Klijent klijent, String brojRacunaUplate) {
+        Racun racunUplate = findActiveRacunByBrojRacuna(brojRacunaUplate);
 
         Transakcija transakcija = new Transakcija();
 
-        transakcija.setTipTransakcije(TipTransakcije.UPLATA);
-        transakcija.setIznos(transakcijaDto.getIznos());
-        transakcija.setValuta(transakcijaDto.getValuta());
+        transakcija.setTipTransakcije(transakcijaRequestDto.getTipTransakcije());
+        transakcija.setIznos(transakcijaRequestDto.getIznos());
+        transakcija.setValuta(transakcijaRequestDto.getValuta());
         transakcija.setRacunUplate(racunUplate);
         transakcija.setRacunIsplate(null);
         transakcija.setKoeficijentKonverzije(0);
@@ -97,37 +118,28 @@ public class TranskacijaServiceImpl implements TransakcijaService {
         transakcija.setKlijentEmail(klijent);
         transakcija.setStatusTransakcije(StatusTransakcije.REALIZOVANA);
 
-        transkacijaRepository.save(transakcija);
+        transakcijaRepository.save(transakcija);
 
-        int noviIznos = racunUplate.getTrenutniIznos() + transakcijaDto.getIznos();
+        TransakcijaResponseDto transakcijaResponseDto = modelMapper.map(transakcija, TransakcijaResponseDto.class);
+
+        double noviIznos = racunUplate.getTrenutniIznos() + transakcijaRequestDto.getIznos();
 
         racunUplate.setTrenutniIznos(noviIznos);
         racunUplate.setDatumPoslednjePromene(LocalDate.now());
 
         racunRepository.save(racunUplate);
 
-        return transakcijaDto;
+        return transakcijaResponseDto;
     }
 
-    public TransakcijaRequestDto withdraw(TransakcijaRequestDto transakcijaDto, String klijentEmail, String brojRacunaIsplate) {
-        Racun racunIsplate = racunRepository.findByBrojRacuna(brojRacunaIsplate);
-        Klijent klijent = klijentRepository.findOneByEmail(klijentEmail);
-
-        if (racunIsplate == null) {
-            throw new EntityNotFoundException("Racun with the provided broj does not exist: " + brojRacunaIsplate);
-        } else if (klijent == null) {
-            throw new EntityNotFoundException("Klijent with the provided email does not exist: " + klijentEmail);
-        }
-
-        if (!racunIsplate.getStatusRacuna().equals(StatusRacuna.AKTIVAN)) {
-            return null;
-        }
+    private TransakcijaResponseDto withdraw(TransakcijaRequestDto transakcijaRequestDto, Klijent klijent, String brojRacunaIsplate) {
+        Racun racunIsplate = findActiveRacunByBrojRacuna(brojRacunaIsplate);
 
         Transakcija transakcija = new Transakcija();
 
         transakcija.setTipTransakcije(TipTransakcije.ISPLATA);
-        transakcija.setIznos(transakcijaDto.getIznos());
-        transakcija.setValuta(transakcijaDto.getValuta());
+        transakcija.setIznos(transakcijaRequestDto.getIznos());
+        transakcija.setValuta(transakcijaRequestDto.getValuta());
         transakcija.setRacunUplate(null);
         transakcija.setRacunIsplate(racunIsplate);
         transakcija.setKoeficijentKonverzije(0);
@@ -135,12 +147,14 @@ public class TranskacijaServiceImpl implements TransakcijaService {
         transakcija.setKlijentEmail(klijent);
         transakcija.setStatusTransakcije(StatusTransakcije.REALIZOVANA);
 
-        transkacijaRepository.save(transakcija);
+        transakcijaRepository.save(transakcija);
 
-        int noviIznos = racunIsplate.getTrenutniIznos() - transakcijaDto.getIznos();
+        TransakcijaResponseDto transakcijaResponseDto = modelMapper.map(transakcija, TransakcijaResponseDto.class);
+
+        double noviIznos = racunIsplate.getTrenutniIznos() - transakcijaRequestDto.getIznos();
 
         if (noviIznos < 0) {
-            return null;
+            throw new NegativeBalanceException("Not enough balance");
         }
 
         racunIsplate.setTrenutniIznos(noviIznos);
@@ -148,7 +162,28 @@ public class TranskacijaServiceImpl implements TransakcijaService {
 
         racunRepository.save(racunIsplate);
 
-        return transakcijaDto;
+        return transakcijaResponseDto;
+    }
+
+
+    //TODO
+    private TransakcijaResponseDto transfer(TransakcijaRequestDto transakcijaRequestDto, Klijent klijent, String brojRacunaUplate, String brojRacunaIsplate) {
+        Racun racunUplate = findActiveRacunByBrojRacuna(brojRacunaUplate);
+        Racun racunIsplate = findActiveRacunByBrojRacuna(brojRacunaIsplate);
+
+        return null;
+    }
+
+    private Racun findActiveRacunByBrojRacuna(String brojRacuna) {
+        Racun racun = racunRepository.findByBrojRacuna(brojRacuna);
+
+        if (racun == null) {
+            throw new EntityNotFoundException("Racun with the provided broj does not exist: " + brojRacuna);
+        } else if (!racun.getStatusRacuna().equals(StatusRacuna.AKTIVAN)) {
+            throw new RacunClosedException("Racun with broj racuna: " + brojRacuna + " is not active");
+        }
+
+        return racun;
     }
 
     private Sort getSortByParameter(String sortBy) {

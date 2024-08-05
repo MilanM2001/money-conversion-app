@@ -60,18 +60,18 @@ public class TranskacijaController {
         }
     }
 
-    @PostMapping("/deposit/{klijentEmail}/{brojRacunaUplate}")
-    public ResponseEntity<TransakcijaRequestDto> deposit(@RequestBody @Valid TransakcijaRequestDto transakcijaDto,
-                                                         @PathVariable("klijentEmail") String klijentEmail,
-                                                         @PathVariable("brojRacunaUplate") String brojRacunaUplate) {
+    //Zahtev za transakciju, salju se email klijenta, broj racuna isplate i uplate
+    //Na osnovu tipa transakcije gleda se da li je uplata, isplata ili prenos izmedju racuna
+    @PostMapping("/transakcija/{klijentEmail}/{brojRacunaUplate}/{brojRacunaIsplate}")
+    public ResponseEntity<TransakcijaRequestDto> transakcija(@RequestBody @Valid TransakcijaRequestDto transakcijaRequestDto,
+                                                             @PathVariable(name = "klijentEmail") String klijentEmail,
+                                                             @PathVariable(name = "brojRacunaUplate", required = false) String brojRacunaUplate,
+                                                             @PathVariable(name = "brojRacunaIsplate", required = false) String brojRacunaIsplate) {
         try {
-            TransakcijaRequestDto transakcija = transkacijaService.deposit(transakcijaDto, klijentEmail, brojRacunaUplate);
+            TransakcijaResponseDto transakcijaResponseDto = transkacijaService.transakcija(transakcijaRequestDto, klijentEmail, brojRacunaUplate, brojRacunaIsplate);
 
-            if (transakcija == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
 
-            return new ResponseEntity<>(transakcija, HttpStatus.OK);
+            return null;
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -79,26 +79,47 @@ public class TranskacijaController {
         }
     }
 
+//    @PostMapping("/deposit/{klijentEmail}/{brojRacunaUplate}")
+//    public ResponseEntity<TransakcijaRequestDto> deposit(@RequestBody @Valid TransakcijaRequestDto transakcijaDto,
+//                                                         @PathVariable("klijentEmail") String klijentEmail,
+//                                                         @PathVariable("brojRacunaUplate") String brojRacunaUplate) {
+//        try {
+//            TransakcijaRequestDto transakcija = transkacijaService.deposit(transakcijaDto, klijentEmail, brojRacunaUplate);
+//
+//            if (transakcija == null) {
+//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//            }
+//
+//            return new ResponseEntity<>(transakcija, HttpStatus.OK);
+//        } catch (EntityNotFoundException e) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+//
+//
+//
+//    //TODO
+//    //Isto za isplatu
+//    @PostMapping("/withdraw/{klijentEmail}/{brojRacunaIsplate}")
+//    public ResponseEntity<TransakcijaRequestDto> withdraw(@RequestBody @Valid TransakcijaRequestDto transakcijaDto,
+//                                                          @PathVariable("klijentEmail") String klijentEmail,
+//                                                          @PathVariable("brojRacunaIsplate") String brojRacunaIsplate) {
+//        try {
+//            TransakcijaRequestDto transakcija = transkacijaService.withdraw(transakcijaDto, klijentEmail, brojRacunaIsplate);
+//
+//            if (transakcija == null) {
+//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//            }
+//
+//            return new ResponseEntity<>(transakcija, HttpStatus.OK);
+//        } catch (EntityNotFoundException e) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
 
-    //TODO
-    //Isto za isplatu
-    @PostMapping("/withdraw/{klijentEmail}/{brojRacunaIsplate}")
-    public ResponseEntity<TransakcijaRequestDto> withdraw(@RequestBody @Valid TransakcijaRequestDto transakcijaDto,
-                                                          @PathVariable("klijentEmail") String klijentEmail,
-                                                          @PathVariable("brojRacunaIsplate") String brojRacunaIsplate) {
-        try {
-            TransakcijaRequestDto transakcija = transkacijaService.withdraw(transakcijaDto, klijentEmail, brojRacunaIsplate);
-
-            if (transakcija == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            return new ResponseEntity<>(transakcija, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }

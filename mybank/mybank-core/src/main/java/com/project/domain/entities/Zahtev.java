@@ -38,7 +38,7 @@ public class Zahtev {
     private Valuta valuta;
 
     @Column(name = "kreditni_limit", nullable = false)
-    private int kreditniLimit;
+    private double kreditniLimit;
 
     @Column(name = "broj_racuna", nullable = false)
     private String brojRacuna;

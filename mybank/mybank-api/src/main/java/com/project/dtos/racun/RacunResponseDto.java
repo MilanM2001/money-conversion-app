@@ -17,8 +17,8 @@ public class RacunResponseDto {
     private String nazivBanke;
     private TipRacuna tipRacuna;
     private String brojRacuna;
-    private int trenutniIznos;
-    private int kreditniLimit;
+    private double trenutniIznos;
+    private double kreditniLimit;
     private Valuta valuta;
     private StatusRacuna statusRacuna;
     private LocalDate datumKreiranja;

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TranskacijaRepository extends JpaRepository<Transakcija, Integer> {
+public interface TransakcijaRepository extends JpaRepository<Transakcija, Integer> {
     @Query(nativeQuery = true, value = "SELECT * FROM transakcije t WHERE t.klijent_email = ?")
     List<Transakcija> findAllByKlijentEmail(String email);
 

@@ -12,7 +12,9 @@ public interface TransakcijaService {
 
     List<TransakcijaResponseDto> findAllByKlijentEmail(String email, String sortBy);
 
-    TransakcijaRequestDto deposit(TransakcijaRequestDto transkacijaDepositDto, String klijentEmail, String brojRacunaUplate);
+    TransakcijaResponseDto transakcija(TransakcijaRequestDto transakcijaRequestDto, String klijentEmail, String brojRacunaUplate, String brojRacunaIsplate);
 
-    TransakcijaRequestDto withdraw(TransakcijaRequestDto transakcijaDto, String klijentEmail, String brojRacunaIsplate);
+//    TransakcijaRequestDto deposit(TransakcijaRequestDto transkacijaDepositDto, String klijentEmail, String brojRacunaUplate);
+//
+//    TransakcijaRequestDto withdraw(TransakcijaRequestDto transakcijaDto, String klijentEmail, String brojRacunaIsplate);
 }

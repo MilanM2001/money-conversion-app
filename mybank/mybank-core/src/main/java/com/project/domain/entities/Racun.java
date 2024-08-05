@@ -31,10 +31,10 @@ public class Racun {
     private TipRacuna tipRacuna;
 
     @Column(name = "trenutni_iznos", nullable = false)
-    private int trenutniIznos;
+    private double trenutniIznos;
 
     @Column(name = "kreditni_limit", nullable = false)
-    private int kreditniLimit;
+    private double kreditniLimit;
 
     @Column(name = "valuta", nullable = false)
     @Enumerated(EnumType.STRING)

@@ -22,5 +22,5 @@ public class ZahtevRequestDto {
     private String brojRacuna;
 
     @NotBlank(message = "Kreditni limit je obavezan")
-    private int kreditniLimit;
+    private double kreditniLimit;
 }

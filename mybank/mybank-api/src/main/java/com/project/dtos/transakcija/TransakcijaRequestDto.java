@@ -1,5 +1,6 @@
 package com.project.dtos.transakcija;
 
+import com.project.enums.TipTransakcije;
 import com.project.enums.Valuta;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -15,11 +16,14 @@ import lombok.NonNull;
 public class TransakcijaRequestDto {
 
     @NonNull
-    @Min(message = "Iznos ne moze biti manji od 10", value = 10)
-    @Max(message = "Iznos ne moze biti veci od 100000", value = 100000)
-    private int iznos;
+    @Min(message = "iznos ne moze biti manji od 10", value = 10)
+    @Max(message = "iznos ne moze biti veci od 100000", value = 100000)
+    private double iznos;
 
-    @NotNull(message = "Valuta je obavezna")
+    @NotNull(message = "valita je obavezna")
     private Valuta valuta;
+
+    @NotNull(message = "tipTransakcije je obavezan")
+    private TipTransakcije tipTransakcije;
 
 }

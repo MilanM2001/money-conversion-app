@@ -1,5 +1,7 @@
 package com.project.controllers;
 
+import com.project.dtos.konverzija.KonverzijaRequestDto;
+import com.project.dtos.konverzija.KonverzijaResponseDto;
 import com.project.dtos.kursnalista.KursnaListaRequestDto;
 import com.project.dtos.kursnalista.KursnaListaResponseDto;
 import com.project.exceptions.EntityAlreadyExistsException;
@@ -36,7 +38,7 @@ public class KursnaListaController {
     }
 
     @GetMapping("/find/{id}")
-    public ResponseEntity<KursnaListaResponseDto> findById(@PathVariable("id") int id) {
+    public ResponseEntity<KursnaListaResponseDto> findById(@PathVariable("id") Integer id) {
         try {
             KursnaListaResponseDto kursnaListaDto = kursnaListaService.findById(id);
 
@@ -80,6 +82,17 @@ public class KursnaListaController {
             return new ResponseEntity<>(kursnaListaDto, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/exchange")
+    public ResponseEntity<KonverzijaResponseDto> exchange(@RequestBody KonverzijaRequestDto konverzijaRequestDto) {
+        try {
+            KonverzijaResponseDto konverzijaResponseDto = kursnaListaService.exchange(konverzijaRequestDto);
+
+            return konverzijaResponseDto;
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

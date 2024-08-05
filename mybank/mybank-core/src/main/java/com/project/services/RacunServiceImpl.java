@@ -12,7 +12,10 @@ import jakarta.persistence.criteria.Predicate;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -106,9 +109,9 @@ public class RacunServiceImpl implements RacunService {
             return null;
         }
 
-        int iznos = racunWithdrawDto.getIznos();
-        int trenutnoStanje = racun.getTrenutniIznos();
-        int novoStanje = trenutnoStanje - iznos;
+        double iznos = racunWithdrawDto.getIznos();
+        double trenutnoStanje = racun.getTrenutniIznos();
+        double novoStanje = trenutnoStanje - iznos;
 
         if (novoStanje < 0) {
             return null;

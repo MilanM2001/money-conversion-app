@@ -17,11 +17,11 @@ import java.time.LocalDate;
 public class TransakcijaResponseDto {
     private Integer id;
     private TipTransakcije tipTransakcije;
-    private int iznos;
+    private double iznos;
     private Valuta valuta;
     private RacunResponseDto racunUplate;
     private RacunResponseDto racunIsplate;
-    private int koeficijentKonverzije;
+    private double koeficijentKonverzije;
     private LocalDate datumTransakcije;
     private KlijentResponseDto klijentEmail;
     private StatusTransakcije statusTransakcije;

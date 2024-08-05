@@ -1,5 +1,7 @@
 package com.project.controllers;
 
+import com.project.dtos.TestDto;
+import com.project.dtos.adresa.AdresaResponseDto;
 import com.project.dtos.racun.RacunDepositDto;
 import com.project.dtos.racun.RacunResponseDto;
 import com.project.dtos.racun.RacunWithdrawDto;
@@ -7,10 +9,13 @@ import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.RacunService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,10 +25,14 @@ import java.util.List;
 public class RacunController {
 
     RacunService racunService;
+    @Value("${MY_EXCHANGE_URL}")
+    private String MyExchangeURL;
+    RestClient restClient;
 
     @Autowired
-    public RacunController(RacunService racunService) {
+    public RacunController(RacunService racunService, RestClient restClient) {
         this.racunService = racunService;
+        this.restClient = restClient;
     }
 
     //Operater ima pregled svih racuna
@@ -100,6 +109,18 @@ public class RacunController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/getHello")
+    public TestDto getHello() {
+        String path = MyExchangeURL + "/api/kursevi/hello";
+        TestDto test = new TestDto("Ime", "Email");
+        TestDto newTest =  restClient.post()
+                .uri(path)
+                .body(test)
+                .retrieve()
+                .body(TestDto.class);
+        return newTest;
     }
 
 }

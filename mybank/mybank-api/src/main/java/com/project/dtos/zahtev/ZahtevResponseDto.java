@@ -19,7 +19,7 @@ public class ZahtevResponseDto {
     private TipZahteva tipZahteva;
     private TipRacuna tipRacuna;
     private Valuta valuta;
-    private int kreditniLimit;
+    private double kreditniLimit;
     private String brojRacuna;
     private StatusZahteva statusZahteva;
     private KlijentResponseDto podnosilacZahteva;

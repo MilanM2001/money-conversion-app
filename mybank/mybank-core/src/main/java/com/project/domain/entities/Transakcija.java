@@ -27,7 +27,7 @@ public class Transakcija {
     private TipTransakcije tipTransakcije;
 
     @Column(name = "iznos", nullable = false)
-    private int iznos;
+    private double iznos;
 
     @Column(name = "valuta", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -42,7 +42,7 @@ public class Transakcija {
     private Racun racunIsplate;
 
     @Column(name = "koeficijent_konverzije", nullable = false)
-    private int koeficijentKonverzije;
+    private double koeficijentKonverzije;
 
     @Column(name = "datum_transakcije", nullable = false)
     private LocalDate datumTransakcije;

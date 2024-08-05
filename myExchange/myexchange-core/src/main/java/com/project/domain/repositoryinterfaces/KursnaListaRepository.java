@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface KursnaListaRepository extends JpaRepository<KursnaLista, Integer> {
 
     @Query(nativeQuery = true, value = "SELECT * FROM kursne_liste k WHERE k.status = 'AKTIVNA'")
-    Optional<KursnaLista> findActivated();
+    Optional<KursnaLista> findActive();
 }
