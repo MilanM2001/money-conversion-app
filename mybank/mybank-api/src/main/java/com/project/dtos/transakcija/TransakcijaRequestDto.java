@@ -18,10 +18,10 @@ public class TransakcijaRequestDto {
     @NonNull
     @Min(message = "iznos ne moze biti manji od 10", value = 10)
     @Max(message = "iznos ne moze biti veci od 100000", value = 100000)
-    private double iznos;
+    private double iznosTransakcije;
 
     @NotNull(message = "valita je obavezna")
-    private Valuta valuta;
+    private Valuta valutaTransakcije;
 
     @NotNull(message = "tipTransakcije je obavezan")
     private TipTransakcije tipTransakcije;

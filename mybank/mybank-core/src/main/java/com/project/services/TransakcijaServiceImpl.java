@@ -6,11 +6,14 @@ import com.project.domain.entities.Transakcija;
 import com.project.domain.repositoryinterfaces.KlijentRepository;
 import com.project.domain.repositoryinterfaces.RacunRepository;
 import com.project.domain.repositoryinterfaces.TransakcijaRepository;
+import com.project.dtos.konverzija.KonverzijaRequestDto;
+import com.project.dtos.konverzija.KonverzijaResponseDto;
 import com.project.dtos.transakcija.TransakcijaRequestDto;
 import com.project.dtos.transakcija.TransakcijaResponseDto;
 import com.project.enums.StatusRacuna;
 import com.project.enums.StatusTransakcije;
 import com.project.enums.TipTransakcije;
+import com.project.exceptions.CurrencyException;
 import com.project.exceptions.EntityNotFoundException;
 import com.project.exceptions.NegativeBalanceException;
 import com.project.exceptions.RacunClosedException;
@@ -18,8 +21,10 @@ import com.project.serviceinterfaces.TransakcijaService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,17 +32,21 @@ import java.util.List;
 @Service
 public class TransakcijaServiceImpl implements TransakcijaService {
 
+    private final RestClient restClient;
     KlijentRepository klijentRepository;
     RacunRepository racunRepository;
     TransakcijaRepository transakcijaRepository;
     ModelMapper modelMapper;
+    @Value("${MY_EXCHANGE_URL}")
+    private String MyExchangeURL;
 
     @Autowired
-    public TransakcijaServiceImpl(TransakcijaRepository transakcijaRepository, ModelMapper modelMapper, KlijentRepository klijentRepository, RacunRepository racunRepository) {
+    public TransakcijaServiceImpl(TransakcijaRepository transakcijaRepository, ModelMapper modelMapper, KlijentRepository klijentRepository, RacunRepository racunRepository, RestClient restClient) {
         this.transakcijaRepository = transakcijaRepository;
         this.modelMapper = modelMapper;
         this.klijentRepository = klijentRepository;
         this.racunRepository = racunRepository;
+        this.restClient = restClient;
     }
 
     @Override
@@ -90,11 +99,15 @@ public class TransakcijaServiceImpl implements TransakcijaService {
         } else if (tipTranskacije == TipTransakcije.ISPLATA) {
             TransakcijaResponseDto transakcijaResponseDto = withdraw(transakcijaRequestDto, klijent, brojRacunaIsplate);
 
+            return transakcijaResponseDto;
         } else if (tipTranskacije == TipTransakcije.PRENOS) {
+            TransakcijaResponseDto transakcijaResponseDto = transfer(transakcijaRequestDto, klijent, brojRacunaUplate, brojRacunaIsplate);
 
+            return transakcijaResponseDto;
+        } else {
+            throw new EnumConstantNotPresentException(TipTransakcije.class, "tipTransakcije");
         }
 
-        return null;
     }
 
 
@@ -106,11 +119,15 @@ public class TransakcijaServiceImpl implements TransakcijaService {
     private TransakcijaResponseDto deposit(TransakcijaRequestDto transakcijaRequestDto, Klijent klijent, String brojRacunaUplate) {
         Racun racunUplate = findActiveRacunByBrojRacuna(brojRacunaUplate);
 
+        if (transakcijaRequestDto.getValutaTransakcije() != racunUplate.getValuta()) {
+            throw new CurrencyException("Currencies for transakcija and racun are not the same");
+        }
+
         Transakcija transakcija = new Transakcija();
 
         transakcija.setTipTransakcije(transakcijaRequestDto.getTipTransakcije());
-        transakcija.setIznos(transakcijaRequestDto.getIznos());
-        transakcija.setValuta(transakcijaRequestDto.getValuta());
+        transakcija.setIznos(transakcijaRequestDto.getIznosTransakcije());
+        transakcija.setValuta(transakcijaRequestDto.getValutaTransakcije());
         transakcija.setRacunUplate(racunUplate);
         transakcija.setRacunIsplate(null);
         transakcija.setKoeficijentKonverzije(0);
@@ -122,7 +139,7 @@ public class TransakcijaServiceImpl implements TransakcijaService {
 
         TransakcijaResponseDto transakcijaResponseDto = modelMapper.map(transakcija, TransakcijaResponseDto.class);
 
-        double noviIznos = racunUplate.getTrenutniIznos() + transakcijaRequestDto.getIznos();
+        double noviIznos = racunUplate.getTrenutniIznos() + transakcijaRequestDto.getIznosTransakcije();
 
         racunUplate.setTrenutniIznos(noviIznos);
         racunUplate.setDatumPoslednjePromene(LocalDate.now());
@@ -135,11 +152,15 @@ public class TransakcijaServiceImpl implements TransakcijaService {
     private TransakcijaResponseDto withdraw(TransakcijaRequestDto transakcijaRequestDto, Klijent klijent, String brojRacunaIsplate) {
         Racun racunIsplate = findActiveRacunByBrojRacuna(brojRacunaIsplate);
 
+        if (transakcijaRequestDto.getValutaTransakcije() != racunIsplate.getValuta()) {
+            throw new CurrencyException("Currencies for transakcija and racun are not the same");
+        }
+
         Transakcija transakcija = new Transakcija();
 
         transakcija.setTipTransakcije(TipTransakcije.ISPLATA);
-        transakcija.setIznos(transakcijaRequestDto.getIznos());
-        transakcija.setValuta(transakcijaRequestDto.getValuta());
+        transakcija.setIznos(transakcijaRequestDto.getIznosTransakcije());
+        transakcija.setValuta(transakcijaRequestDto.getValutaTransakcije());
         transakcija.setRacunUplate(null);
         transakcija.setRacunIsplate(racunIsplate);
         transakcija.setKoeficijentKonverzije(0);
@@ -151,7 +172,7 @@ public class TransakcijaServiceImpl implements TransakcijaService {
 
         TransakcijaResponseDto transakcijaResponseDto = modelMapper.map(transakcija, TransakcijaResponseDto.class);
 
-        double noviIznos = racunIsplate.getTrenutniIznos() - transakcijaRequestDto.getIznos();
+        double noviIznos = racunIsplate.getTrenutniIznos() - transakcijaRequestDto.getIznosTransakcije();
 
         if (noviIznos < 0) {
             throw new NegativeBalanceException("Not enough balance");
@@ -167,11 +188,35 @@ public class TransakcijaServiceImpl implements TransakcijaService {
 
 
     //TODO
+    //Valuta transkacije i valuta racuna uplate moraju biti iste
     private TransakcijaResponseDto transfer(TransakcijaRequestDto transakcijaRequestDto, Klijent klijent, String brojRacunaUplate, String brojRacunaIsplate) {
         Racun racunUplate = findActiveRacunByBrojRacuna(brojRacunaUplate);
         Racun racunIsplate = findActiveRacunByBrojRacuna(brojRacunaIsplate);
 
-        return null;
+        if (transakcijaRequestDto.getValutaTransakcije() != racunIsplate.getValuta()) {
+            throw new CurrencyException("Transakcija curreny and racun isplate currency are different");
+        }
+
+        KonverzijaRequestDto konverzijaRequestDto = new KonverzijaRequestDto();
+
+        konverzijaRequestDto.setIznosTransakcije(transakcijaRequestDto.getIznosTransakcije());
+        konverzijaRequestDto.setValutaTransakcije(transakcijaRequestDto.getValutaTransakcije());
+        konverzijaRequestDto.setValutaRacunaUplate(racunUplate.getValuta());
+
+        KonverzijaResponseDto konverzijaResponseDto = restClient.post()
+                .uri(MyExchangeURL + "/api/kursneListe/exchange")
+                .body(konverzijaRequestDto)
+                .retrieve()
+                .body(KonverzijaResponseDto.class);
+
+        //Dodati i samo prikazati bez cuvanja kako bi testirao
+        TransakcijaResponseDto transakcijaResponseDto = new TransakcijaResponseDto();
+        transakcijaResponseDto.setStatusTransakcije(StatusTransakcije.REALIZOVANA);
+
+        System.out.println(konverzijaResponseDto.getKonvertovaniIznos());
+        System.out.println("OVDE");
+
+        return transakcijaResponseDto;
     }
 
     private Racun findActiveRacunByBrojRacuna(String brojRacuna) {

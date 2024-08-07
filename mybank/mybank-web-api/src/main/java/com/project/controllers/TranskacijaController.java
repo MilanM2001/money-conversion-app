@@ -2,6 +2,7 @@ package com.project.controllers;
 
 import com.project.dtos.transakcija.TransakcijaRequestDto;
 import com.project.dtos.transakcija.TransakcijaResponseDto;
+import com.project.exceptions.CurrencyException;
 import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.TransakcijaService;
 import jakarta.validation.Valid;
@@ -63,7 +64,7 @@ public class TranskacijaController {
     //Zahtev za transakciju, salju se email klijenta, broj racuna isplate i uplate
     //Na osnovu tipa transakcije gleda se da li je uplata, isplata ili prenos izmedju racuna
     @PostMapping("/transakcija/{klijentEmail}/{brojRacunaUplate}/{brojRacunaIsplate}")
-    public ResponseEntity<TransakcijaRequestDto> transakcija(@RequestBody @Valid TransakcijaRequestDto transakcijaRequestDto,
+    public ResponseEntity<TransakcijaResponseDto> transakcija(@RequestBody @Valid TransakcijaRequestDto transakcijaRequestDto,
                                                              @PathVariable(name = "klijentEmail") String klijentEmail,
                                                              @PathVariable(name = "brojRacunaUplate", required = false) String brojRacunaUplate,
                                                              @PathVariable(name = "brojRacunaIsplate", required = false) String brojRacunaIsplate) {
@@ -71,11 +72,13 @@ public class TranskacijaController {
             TransakcijaResponseDto transakcijaResponseDto = transkacijaService.transakcija(transakcijaRequestDto, klijentEmail, brojRacunaUplate, brojRacunaIsplate);
 
 
-            return null;
+            return new ResponseEntity<>(transakcijaResponseDto, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (CurrencyException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (EnumConstantNotPresentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 

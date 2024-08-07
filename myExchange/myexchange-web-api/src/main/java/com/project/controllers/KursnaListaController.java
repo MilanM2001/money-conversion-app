@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -88,13 +89,15 @@ public class KursnaListaController {
     }
 
     @PostMapping("/exchange")
-    public ResponseEntity<KonverzijaResponseDto> exchange(@RequestBody KonverzijaRequestDto konverzijaRequestDto) {
+    public KonverzijaResponseDto exchange(@RequestBody KonverzijaRequestDto konverzijaRequestDto) {
         try {
             KonverzijaResponseDto konverzijaResponseDto = kursnaListaService.exchange(konverzijaRequestDto);
 
             return konverzijaResponseDto;
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return null;
         }
     }
 
