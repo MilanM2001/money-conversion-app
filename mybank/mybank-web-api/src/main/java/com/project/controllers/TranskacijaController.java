@@ -4,6 +4,7 @@ import com.project.dtos.transakcija.TransakcijaRequestDto;
 import com.project.dtos.transakcija.TransakcijaResponseDto;
 import com.project.exceptions.CurrencyException;
 import com.project.exceptions.EntityNotFoundException;
+import com.project.exceptions.NegativeBalanceException;
 import com.project.serviceinterfaces.TransakcijaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,10 +62,10 @@ public class TranskacijaController {
         }
     }
 
-    //Zahtev za transakciju, salju se email klijenta, broj racuna isplate i uplate
+    //Zahtev za transakciju, salju se email klijenta, brojevi racuna isplate i uplate
     //Na osnovu tipa transakcije gleda se da li je uplata, isplata ili prenos izmedju racuna
     @PostMapping("/transakcija/{klijentEmail}/{brojRacunaUplate}/{brojRacunaIsplate}")
-    public ResponseEntity<TransakcijaResponseDto> transakcija(@RequestBody @Valid TransakcijaRequestDto transakcijaRequestDto,
+    public ResponseEntity<TransakcijaResponseDto> transakcija(@RequestBody TransakcijaRequestDto transakcijaRequestDto,
                                                              @PathVariable(name = "klijentEmail") String klijentEmail,
                                                              @PathVariable(name = "brojRacunaUplate", required = false) String brojRacunaUplate,
                                                              @PathVariable(name = "brojRacunaIsplate", required = false) String brojRacunaIsplate) {
@@ -79,50 +80,11 @@ public class TranskacijaController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (EnumConstantNotPresentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (NegativeBalanceException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-//    @PostMapping("/deposit/{klijentEmail}/{brojRacunaUplate}")
-//    public ResponseEntity<TransakcijaRequestDto> deposit(@RequestBody @Valid TransakcijaRequestDto transakcijaDto,
-//                                                         @PathVariable("klijentEmail") String klijentEmail,
-//                                                         @PathVariable("brojRacunaUplate") String brojRacunaUplate) {
-//        try {
-//            TransakcijaRequestDto transakcija = transkacijaService.deposit(transakcijaDto, klijentEmail, brojRacunaUplate);
-//
-//            if (transakcija == null) {
-//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//            }
-//
-//            return new ResponseEntity<>(transakcija, HttpStatus.OK);
-//        } catch (EntityNotFoundException e) {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-//
-//
-//
-//    //TODO
-//    //Isto za isplatu
-//    @PostMapping("/withdraw/{klijentEmail}/{brojRacunaIsplate}")
-//    public ResponseEntity<TransakcijaRequestDto> withdraw(@RequestBody @Valid TransakcijaRequestDto transakcijaDto,
-//                                                          @PathVariable("klijentEmail") String klijentEmail,
-//                                                          @PathVariable("brojRacunaIsplate") String brojRacunaIsplate) {
-//        try {
-//            TransakcijaRequestDto transakcija = transkacijaService.withdraw(transakcijaDto, klijentEmail, brojRacunaIsplate);
-//
-//            if (transakcija == null) {
-//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//            }
-//
-//            return new ResponseEntity<>(transakcija, HttpStatus.OK);
-//        } catch (EntityNotFoundException e) {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-
 
 }

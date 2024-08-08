@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface KursRepository extends JpaRepository<Kurs, Integer> {
 
-    @Query(nativeQuery = true, value = "SELECT * FROM kursevi k WHERE k.kursna_lista = 1 AND k.oznaka_valute = ?;")
-    Kurs findByKursnaListaAndValuta(Integer kursnaListaId, Valuta valuta);
+    @Query(nativeQuery = true, value = "SELECT * FROM kursevi k WHERE k.kursna_lista = ?1 AND k.oznaka_valute = ?2;")
+    Kurs findByKursnaListaAndValuta(Integer kursnaListaId, String valuta);
 }

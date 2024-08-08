@@ -3,6 +3,7 @@ package com.project.controllers;
 import com.project.dtos.TestDto;
 import com.project.dtos.kurs.KursRequestDto;
 import com.project.dtos.kurs.KursResponseDto;
+import com.project.enums.Valuta;
 import com.project.exceptions.EntityNotAccessibleException;
 import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterface.KursService;
@@ -60,6 +61,22 @@ public class KursController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (EntityNotAccessibleException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //---------------------------------------------------------
+
+    @GetMapping("/findActiveValuta/{valuta}")
+    public ResponseEntity<KursResponseDto> findActiveValuta(@PathVariable("valuta") String valuta) {
+        try {
+            Integer value = 1;
+            KursResponseDto kursResponseDto = kursService.findByKursnaListaAndValuta(value, valuta);
+
+            return new ResponseEntity<>(kursResponseDto, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

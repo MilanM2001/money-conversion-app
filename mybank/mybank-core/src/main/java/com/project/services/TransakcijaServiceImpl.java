@@ -187,14 +187,18 @@ public class TransakcijaServiceImpl implements TransakcijaService {
     }
 
 
-    //TODO
-    //Valuta transkacije i valuta racuna uplate moraju biti iste
+    //Racun uplate je onaj na koji se uplacuje novac, racun isplate je onaj koji salje novac
     private TransakcijaResponseDto transfer(TransakcijaRequestDto transakcijaRequestDto, Klijent klijent, String brojRacunaUplate, String brojRacunaIsplate) {
         Racun racunUplate = findActiveRacunByBrojRacuna(brojRacunaUplate);
         Racun racunIsplate = findActiveRacunByBrojRacuna(brojRacunaIsplate);
 
+        //Valuta transakcije i valuta racuna isplate moraju biti iste
         if (transakcijaRequestDto.getValutaTransakcije() != racunIsplate.getValuta()) {
-            throw new CurrencyException("Transakcija curreny and racun isplate currency are different");
+            throw new CurrencyException("Transakcija currency and racun isplate currency are different");
+        }
+
+        if (racunIsplate.getTrenutniIznos() < transakcijaRequestDto.getIznosTransakcije()) {
+            throw new NegativeBalanceException("Not enough balance");
         }
 
         KonverzijaRequestDto konverzijaRequestDto = new KonverzijaRequestDto();
@@ -203,18 +207,46 @@ public class TransakcijaServiceImpl implements TransakcijaService {
         konverzijaRequestDto.setValutaTransakcije(transakcijaRequestDto.getValutaTransakcije());
         konverzijaRequestDto.setValutaRacunaUplate(racunUplate.getValuta());
 
+        //Saljemo zahtev na drugi servis, vracamo konvertovanu sumu koju onda dodajemo racunu uplate
+
         KonverzijaResponseDto konverzijaResponseDto = restClient.post()
                 .uri(MyExchangeURL + "/api/kursneListe/exchange")
                 .body(konverzijaRequestDto)
                 .retrieve()
                 .body(KonverzijaResponseDto.class);
 
-        //Dodati i samo prikazati bez cuvanja kako bi testirao
-        TransakcijaResponseDto transakcijaResponseDto = new TransakcijaResponseDto();
-        transakcijaResponseDto.setStatusTransakcije(StatusTransakcije.REALIZOVANA);
+        double noviIznosRacunUplate = konverzijaResponseDto.getKonvertovaniIznos() + racunUplate.getTrenutniIznos();
+        double noviIznosRacunIsplate = racunIsplate.getTrenutniIznos() - transakcijaRequestDto.getIznosTransakcije();
 
-        System.out.println(konverzijaResponseDto.getKonvertovaniIznos());
-        System.out.println("OVDE");
+        //Racun uplate se menja, dodaje mu se konvertovana suma
+        racunUplate.setTrenutniIznos(noviIznosRacunUplate);
+        racunUplate.setDatumPoslednjePromene(LocalDate.now());
+        racunRepository.save(racunUplate);
+
+        //Racun isplate se menja, oduzima mu se vrednost iz transakcije
+        racunIsplate.setTrenutniIznos(noviIznosRacunIsplate);
+        racunIsplate.setDatumPoslednjePromene(LocalDate.now());
+        racunRepository.save(racunIsplate);
+
+        System.out.println("RACUN UPLATE: " + racunUplate.getTrenutniIznos());
+        System.out.println("RACUN ISPLATE: " + racunIsplate.getTrenutniIznos());
+
+        //Transakcija se kreira i dodaje
+        Transakcija transakcija = new Transakcija();
+
+        transakcija.setTipTransakcije(TipTransakcije.PRENOS);
+        transakcija.setIznos(transakcijaRequestDto.getIznosTransakcije());
+        transakcija.setValuta(transakcijaRequestDto.getValutaTransakcije());
+        transakcija.setRacunUplate(racunUplate);
+        transakcija.setRacunIsplate(racunIsplate);
+        transakcija.setKoeficijentKonverzije(konverzijaResponseDto.getKoeficijent());
+        transakcija.setDatumTransakcije(LocalDate.now());
+        transakcija.setKlijentEmail(klijent);
+        transakcija.setStatusTransakcije(StatusTransakcije.REALIZOVANA);
+
+        transakcijaRepository.save(transakcija);
+
+        TransakcijaResponseDto transakcijaResponseDto = modelMapper.map(transakcija, TransakcijaResponseDto.class);
 
         return transakcijaResponseDto;
     }

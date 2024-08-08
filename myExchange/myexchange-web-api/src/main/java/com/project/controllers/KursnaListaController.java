@@ -88,12 +88,17 @@ public class KursnaListaController {
         }
     }
 
+    //TODO DODAJ EXCEPTION NOT FOUND
     @PostMapping("/exchange")
     public KonverzijaResponseDto exchange(@RequestBody KonverzijaRequestDto konverzijaRequestDto) {
         try {
             KonverzijaResponseDto konverzijaResponseDto = kursnaListaService.exchange(konverzijaRequestDto);
 
             return konverzijaResponseDto;
+        } catch (EntityNotFoundException e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return null;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println(e.getCause());

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -109,68 +110,67 @@ public class KursnaListaServiceImpl implements KursnaListaService {
     public KonverzijaResponseDto exchange(KonverzijaRequestDto konverzijaRequestDto) {
 
         double iznosTransakcije = konverzijaRequestDto.getIznosTransakcije();
-        KonverzijaResponseDto konverzijaResponseDto = konverzija(iznosTransakcije, konverzijaRequestDto.getValutaTransakcije(), konverzijaRequestDto.getValutaRacunaUplate());
+        String valutaTransakcije = konverzijaRequestDto.getValutaTransakcije().toString();
+        String valutaRacunaUplate = konverzijaRequestDto.getValutaRacunaUplate().toString();
+
+        KonverzijaResponseDto konverzijaResponseDto = konverzija(iznosTransakcije, valutaTransakcije, valutaRacunaUplate);
 
         return konverzijaResponseDto;
     }
 
     //Valuta transkacije je ista kao valuta racuna isplate, valuta racuna uplate je drugacija i u nju konvertujemo
-    private KonverzijaResponseDto konverzija(double iznosTransakcije, Valuta valutaTransakcije, Valuta valutaRacunaUplate) {
+    private KonverzijaResponseDto konverzija(double iznosTransakcije, String valutaTransakcije, String valutaRacunaUplate) {
         KonverzijaResponseDto konverzijaResponseDto = new KonverzijaResponseDto();
-        double konvertovaniIznos = 0.0;
+        double konvertovaniIznos;
 
-        KursnaLista kursnaLista = kursnaListaRepository.findActive().orElse(null);
+        KursnaLista kursnaLista = kursnaListaRepository.findActive().orElseThrow(() ->
+                new EntityNotFoundException("Cannot find an active kursna lista"));
 
-        if (kursnaLista == null) {
-            throw new EntityNotFoundException("Cannot find an active kursna lista");
-        }
-
-
-        //RSD --> EUR/USD
-        //Ako je valuta transkacije RSD onda je valuta racuna uplate EUR/USD
-        if (valutaTransakcije == Valuta.RSD) {
-            //Kurs se nadje za aktivnu kursnu listu i za valutu racuna uplate(onaj u koji se radi konverzija)
-            Kurs kurs = kursRepository.findByKursnaListaAndValuta(kursnaLista.getId(), valutaRacunaUplate);
-
-            if (kurs == null) {
-                throw new EntityNotFoundException("Cannot find a kurs with kursna lista id: " + kursnaLista.getId() + " and valuta: " + valutaRacunaUplate);
-            }
-
-            konvertovaniIznos = iznosTransakcije / kurs.getProdajniKurs();
-
-        //EUR/USD --> RSD
-        //Ako je valuta racuna uplate RSD onda je valuta transakcije EUR/USD
-        } else if (valutaRacunaUplate == Valuta.RSD) {
-            Kurs kursTransakcije = kursRepository.findByKursnaListaAndValuta(kursnaLista.getId(), valutaTransakcije);
-
-            if (kursTransakcije == null) {
-                throw new EntityNotFoundException("Cannot find a kurs with kursna lista id: " + kursnaLista.getId() + " and valuta: " + valutaRacunaUplate);
-            }
-
-            konvertovaniIznos = iznosTransakcije * kursTransakcije.getKupovniKurs();
-        } else {
-            // USD to EUR or EUR to USD via RSD
-            Kurs kursTransakcije = kursRepository.findByKursnaListaAndValuta(kursnaLista.getId(), valutaTransakcije);
-
-            if (kursTransakcije == null) {
-                throw new EntityNotFoundException("Cannot find a kurs for the transaction currency");
-            }
-
-            double iznosRSD = iznosTransakcije * kursTransakcije.getKupovniKurs();
+        // If the transaction currency is RSD
+        if (Objects.equals(valutaTransakcije, "RSD")) {
             Kurs kursUplate = kursRepository.findByKursnaListaAndValuta(kursnaLista.getId(), valutaRacunaUplate);
 
             if (kursUplate == null) {
-                throw new EntityNotFoundException("Cannot find a kurs for the target currency");
+                throw new EntityNotFoundException("Cannot find a kurs for valuta: " + valutaRacunaUplate);
             }
+
+            // Convert RSD to EUR/USD
+            konvertovaniIznos = iznosTransakcije / kursUplate.getProdajniKurs();
+
+        } else if (Objects.equals(valutaRacunaUplate, "RSD")) {
+            // If the account currency is RSD
+            Kurs kursTransakcije = kursRepository.findByKursnaListaAndValuta(kursnaLista.getId(), valutaTransakcije);
+
+            if (kursTransakcije == null) {
+                throw new EntityNotFoundException("Cannot find a kurs for valuta: " + valutaTransakcije);
+            }
+
+            // Convert EUR/USD to RSD
+            konvertovaniIznos = iznosTransakcije * kursTransakcije.getKupovniKurs();
+
+        } else {
+            // Converting EUR to USD or USD to EUR via RSD as an intermediary
+            Kurs kursTransakcije = kursRepository.findByKursnaListaAndValuta(kursnaLista.getId(), valutaTransakcije);
+
+            if (kursTransakcije == null) {
+                throw new EntityNotFoundException("Cannot find a kurs for valuta: " + valutaTransakcije);
+            }
+
+            Kurs kursUplate = kursRepository.findByKursnaListaAndValuta(kursnaLista.getId(), valutaRacunaUplate);
+
+            if (kursUplate == null) {
+                throw new EntityNotFoundException("Cannot find a kurs for valuta: " + valutaRacunaUplate);
+            }
+
+            double iznosRSD = iznosTransakcije * kursTransakcije.getKupovniKurs();
 
             konvertovaniIznos = iznosRSD / kursUplate.getProdajniKurs();
         }
 
         konverzijaResponseDto.setKonvertovaniIznos(konvertovaniIznos);
-        konverzijaResponseDto.setKoeficijent(10);
+        konverzijaResponseDto.setKoeficijent(10); // Set the coefficient as needed
 
         return konverzijaResponseDto;
     }
-
 
 }

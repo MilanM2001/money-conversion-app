@@ -7,6 +7,7 @@ import com.project.domain.repositoryinterfaces.KursnaListaRepository;
 import com.project.dtos.kurs.KursRequestDto;
 import com.project.dtos.kurs.KursResponseDto;
 import com.project.enums.StatusKursneListe;
+import com.project.enums.Valuta;
 import com.project.exceptions.EntityNotAccessibleException;
 import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterface.KursService;
@@ -47,6 +48,19 @@ public class KursServiceImpl implements KursService {
 
         if (kurs == null) {
             throw new EntityNotFoundException("Cannot find kurs with id " + id);
+        }
+
+        KursResponseDto kursDto = modelMapper.map(kurs, KursResponseDto.class);
+
+        return kursDto;
+    }
+
+    @Override
+    public KursResponseDto findByKursnaListaAndValuta(Integer kursnaListaId, String valuta) {
+        Kurs kurs = kursRepository.findByKursnaListaAndValuta(kursnaListaId, valuta);
+
+        if (kurs == null) {
+            throw new EntityNotFoundException("Cannot find kurs with id " + kursnaListaId + " and valuta " + valuta);
         }
 
         KursResponseDto kursDto = modelMapper.map(kurs, KursResponseDto.class);
