@@ -23,6 +23,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -52,9 +53,8 @@ public class TransakcijaServiceImpl implements TransakcijaService {
     @Override
     public List<TransakcijaResponseDto> findAll() {
         List<Transakcija> transakcije = transakcijaRepository.findAll();
-        List<TransakcijaResponseDto> transakcijeDto = modelMapper.map(transakcije, new TypeToken<List<TransakcijaResponseDto>>() {}.getType());
 
-        return transakcijeDto;
+        return modelMapper.map(transakcije, new TypeToken<List<TransakcijaResponseDto>>() {}.getType());
     }
 
     @Override
@@ -64,9 +64,8 @@ public class TransakcijaServiceImpl implements TransakcijaService {
         }
 
         List<Transakcija> transakcije = transakcijaRepository.findAllByKlijentEmail(email);
-        List<TransakcijaResponseDto> transkacijeDto = modelMapper.map(transakcije, new TypeToken<List<TransakcijaResponseDto>>() {}.getType());
 
-        return transkacijeDto;
+        return modelMapper.map(transakcije, new TypeToken<List<TransakcijaResponseDto>>() {}.getType());
     }
 
     @Override
@@ -74,9 +73,8 @@ public class TransakcijaServiceImpl implements TransakcijaService {
         Sort sort = getSortByParameter(sortBy);
         Klijent klijent = klijentRepository.findOneByEmail(email);
         List<Transakcija> transakcije = transakcijaRepository.findAllByKlijentEmail(klijent, sort);
-        List<TransakcijaResponseDto> transakcijeDto = modelMapper.map(transakcije, new TypeToken<List<TransakcijaResponseDto>>() {}.getType());
 
-        return transakcijeDto;
+        return modelMapper.map(transakcije, new TypeToken<List<TransakcijaResponseDto>>() {}.getType());
     }
 
 
@@ -93,25 +91,22 @@ public class TransakcijaServiceImpl implements TransakcijaService {
         TipTransakcije tipTranskacije = transakcijaRequestDto.getTipTransakcije();
 
         if (tipTranskacije == TipTransakcije.UPLATA) {
-            TransakcijaResponseDto transakcijaResponseDto = deposit(transakcijaRequestDto, klijent, brojRacunaUplate);
 
-            return transakcijaResponseDto;
+            return deposit(transakcijaRequestDto, klijent, brojRacunaUplate);
+
         } else if (tipTranskacije == TipTransakcije.ISPLATA) {
-            TransakcijaResponseDto transakcijaResponseDto = withdraw(transakcijaRequestDto, klijent, brojRacunaIsplate);
 
-            return transakcijaResponseDto;
+            return withdraw(transakcijaRequestDto, klijent, brojRacunaIsplate);
+
         } else if (tipTranskacije == TipTransakcije.PRENOS) {
-            TransakcijaResponseDto transakcijaResponseDto = transfer(transakcijaRequestDto, klijent, brojRacunaUplate, brojRacunaIsplate);
 
-            return transakcijaResponseDto;
+            return transfer(transakcijaRequestDto, klijent, brojRacunaUplate, brojRacunaIsplate);
+
         } else {
             throw new EnumConstantNotPresentException(TipTransakcije.class, "tipTransakcije");
         }
 
     }
-
-
-
 
 
     //TODO
@@ -137,8 +132,6 @@ public class TransakcijaServiceImpl implements TransakcijaService {
 
         transakcijaRepository.save(transakcija);
 
-        TransakcijaResponseDto transakcijaResponseDto = modelMapper.map(transakcija, TransakcijaResponseDto.class);
-
         double noviIznos = racunUplate.getTrenutniIznos() + transakcijaRequestDto.getIznosTransakcije();
 
         racunUplate.setTrenutniIznos(noviIznos);
@@ -146,7 +139,7 @@ public class TransakcijaServiceImpl implements TransakcijaService {
 
         racunRepository.save(racunUplate);
 
-        return transakcijaResponseDto;
+        return modelMapper.map(transakcija, TransakcijaResponseDto.class);
     }
 
     private TransakcijaResponseDto withdraw(TransakcijaRequestDto transakcijaRequestDto, Klijent klijent, String brojRacunaIsplate) {
@@ -170,8 +163,6 @@ public class TransakcijaServiceImpl implements TransakcijaService {
 
         transakcijaRepository.save(transakcija);
 
-        TransakcijaResponseDto transakcijaResponseDto = modelMapper.map(transakcija, TransakcijaResponseDto.class);
-
         double noviIznos = racunIsplate.getTrenutniIznos() - transakcijaRequestDto.getIznosTransakcije();
 
         if (noviIznos < 0) {
@@ -183,9 +174,8 @@ public class TransakcijaServiceImpl implements TransakcijaService {
 
         racunRepository.save(racunIsplate);
 
-        return transakcijaResponseDto;
+        return modelMapper.map(transakcija, TransakcijaResponseDto.class);
     }
-
 
     //Racun uplate je onaj na koji se uplacuje novac, racun isplate je onaj koji salje novac
     private TransakcijaResponseDto transfer(TransakcijaRequestDto transakcijaRequestDto, Klijent klijent, String brojRacunaUplate, String brojRacunaIsplate) {
@@ -201,6 +191,16 @@ public class TransakcijaServiceImpl implements TransakcijaService {
             throw new NegativeBalanceException("Not enough balance");
         }
 
+        //Ukoliko racun uplate i isplate imaju razlicite valute onda treba konverzija
+        if (racunUplate.getValuta() != racunIsplate.getValuta()) {
+            return transferWithExchange(transakcijaRequestDto, klijent, racunUplate, racunIsplate);
+        } else {
+            return transferWithoutExchange(transakcijaRequestDto, klijent, racunUplate, racunIsplate);
+        }
+
+    }
+
+    private TransakcijaResponseDto transferWithExchange(TransakcijaRequestDto transakcijaRequestDto, Klijent klijent, Racun racunUplate, Racun racunIsplate) {
         KonverzijaRequestDto konverzijaRequestDto = new KonverzijaRequestDto();
 
         konverzijaRequestDto.setIznosTransakcije(transakcijaRequestDto.getIznosTransakcije());
@@ -228,9 +228,6 @@ public class TransakcijaServiceImpl implements TransakcijaService {
         racunIsplate.setDatumPoslednjePromene(LocalDate.now());
         racunRepository.save(racunIsplate);
 
-        System.out.println("RACUN UPLATE: " + racunUplate.getTrenutniIznos());
-        System.out.println("RACUN ISPLATE: " + racunIsplate.getTrenutniIznos());
-
         //Transakcija se kreira i dodaje
         Transakcija transakcija = new Transakcija();
 
@@ -246,9 +243,36 @@ public class TransakcijaServiceImpl implements TransakcijaService {
 
         transakcijaRepository.save(transakcija);
 
-        TransakcijaResponseDto transakcijaResponseDto = modelMapper.map(transakcija, TransakcijaResponseDto.class);
+        return modelMapper.map(transakcija, TransakcijaResponseDto.class);
+    }
 
-        return transakcijaResponseDto;
+    private TransakcijaResponseDto transferWithoutExchange(TransakcijaRequestDto transakcijaRequestDto, Klijent klijent, Racun racunUplate, Racun racunIsplate) {
+        double noviIznosRacunUplate = transakcijaRequestDto.getIznosTransakcije() + racunUplate.getTrenutniIznos();
+        double noviIznosRacunIsplate = racunIsplate.getTrenutniIznos() - transakcijaRequestDto.getIznosTransakcije();
+
+        racunUplate.setTrenutniIznos(noviIznosRacunUplate);
+        racunUplate.setDatumPoslednjePromene(LocalDate.now());
+        racunRepository.save(racunUplate);
+
+        racunIsplate.setTrenutniIznos(noviIznosRacunIsplate);
+        racunIsplate.setDatumPoslednjePromene(LocalDate.now());
+        racunRepository.save(racunIsplate);
+
+        Transakcija transakcija = new Transakcija();
+
+        transakcija.setTipTransakcije(TipTransakcije.PRENOS);
+        transakcija.setIznos(transakcijaRequestDto.getIznosTransakcije());
+        transakcija.setValuta(transakcijaRequestDto.getValutaTransakcije());
+        transakcija.setRacunUplate(racunUplate);
+        transakcija.setRacunIsplate(racunIsplate);
+        transakcija.setKoeficijentKonverzije(0);
+        transakcija.setDatumTransakcije(LocalDate.now());
+        transakcija.setKlijentEmail(klijent);
+        transakcija.setStatusTransakcije(StatusTransakcije.REALIZOVANA);
+
+        transakcijaRepository.save(transakcija);
+
+        return modelMapper.map(transakcija, TransakcijaResponseDto.class);
     }
 
     private Racun findActiveRacunByBrojRacuna(String brojRacuna) {

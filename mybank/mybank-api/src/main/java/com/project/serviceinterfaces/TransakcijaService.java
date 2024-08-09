@@ -13,8 +13,4 @@ public interface TransakcijaService {
     List<TransakcijaResponseDto> findAllByKlijentEmail(String email, String sortBy);
 
     TransakcijaResponseDto transakcija(TransakcijaRequestDto transakcijaRequestDto, String klijentEmail, String brojRacunaUplate, String brojRacunaIsplate);
-
-//    TransakcijaRequestDto deposit(TransakcijaRequestDto transkacijaDepositDto, String klijentEmail, String brojRacunaUplate);
-//
-//    TransakcijaRequestDto withdraw(TransakcijaRequestDto transakcijaDto, String klijentEmail, String brojRacunaIsplate);
 }

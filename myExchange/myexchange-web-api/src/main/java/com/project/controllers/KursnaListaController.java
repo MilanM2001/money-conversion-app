@@ -96,8 +96,7 @@ public class KursnaListaController {
 
             return konverzijaResponseDto;
         } catch (EntityNotFoundException e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
+            e.getMessage();
             return null;
         } catch (Exception e) {
             System.out.println(e.getMessage());
