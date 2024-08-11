@@ -9,10 +9,9 @@ import com.project.dtos.konverzija.KonverzijaResponseDto;
 import com.project.dtos.kursnalista.KursnaListaRequestDto;
 import com.project.dtos.kursnalista.KursnaListaResponseDto;
 import com.project.enums.StatusKursneListe;
-import com.project.enums.Valuta;
-import com.project.exceptions.EntityAlreadyExistsException;
-import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterface.KursnaListaService;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +80,7 @@ public class KursnaListaServiceImpl implements KursnaListaService {
         }
 
         if (activeKursnaLista.isPresent()) {
-            throw new EntityAlreadyExistsException("An activated kursna lista with id: " + id + " already exists");
+            throw new EntityExistsException("An activated kursna lista with id: " + id + " already exists");
         }
 
         kursnaLista.setStatus(StatusKursneListe.AKTIVNA);

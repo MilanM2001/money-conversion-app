@@ -5,6 +5,8 @@ import com.project.domain.repositoryinterfaces.OperaterRepository;
 import com.project.dtos.operater.OperaterRequestDto;
 import com.project.dtos.operater.OperaterResponseDto;
 import com.project.serviceinterfaces.OperaterService;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,20 +29,19 @@ public class OperaterServiceImpl implements OperaterService {
     @Override
     public List<OperaterResponseDto> findAll() {
         List<Operater> operateri = operaterRepository.findAll();
-        List<OperaterResponseDto> operateriDto = modelMapper.map(operateri, new TypeToken<List<OperaterResponseDto>>() {}.getType());
 
-        return operateriDto;
+        return modelMapper.map(operateri, new TypeToken<List<OperaterResponseDto>>() {}.getType());
     }
 
     @Override
     public OperaterResponseDto findOneByEmail(String email) {
         Operater operater = operaterRepository.findOneByEmail(email);
+
         if (operater == null) {
-            return null;
+            throw new EntityNotFoundException("Operater not found for email: " + email);
         }
 
-        OperaterResponseDto operaterResponseDto = modelMapper.map(operater, OperaterResponseDto.class);
-        return operaterResponseDto;
+        return modelMapper.map(operater, OperaterResponseDto.class);
     }
 
     @Override
@@ -49,7 +50,7 @@ public class OperaterServiceImpl implements OperaterService {
         Operater existingOperater = operaterRepository.findOneByEmail(operaterRequestDto.getEmail());
 
         if (existingOperater != null) {
-            return null;
+            throw new EntityExistsException("Operater already exists");
         }
 
         Operater operater = modelMapper.map(operaterRequestDto, Operater.class);

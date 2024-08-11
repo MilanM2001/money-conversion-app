@@ -1,16 +1,13 @@
 package com.project.controllers;
 
-import com.project.dtos.TestDto;
 import com.project.dtos.kurs.KursRequestDto;
 import com.project.dtos.kurs.KursResponseDto;
-import com.project.enums.Valuta;
 import com.project.exceptions.EntityNotAccessibleException;
-import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterface.KursService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,29 +61,6 @@ public class KursController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    //---------------------------------------------------------
-
-    @GetMapping("/findActiveValuta/{valuta}")
-    public ResponseEntity<KursResponseDto> findActiveValuta(@PathVariable("valuta") String valuta) {
-        try {
-            Integer value = 1;
-            KursResponseDto kursResponseDto = kursService.findByKursnaListaAndValuta(value, valuta);
-
-            return new ResponseEntity<>(kursResponseDto, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PostMapping("/hello")
-    public TestDto hello(@RequestBody TestDto testDto) {
-        testDto.setName("uspeo");
-        testDto.setEmail("uspeo@uspeo.com");
-        return testDto;
     }
 
 }

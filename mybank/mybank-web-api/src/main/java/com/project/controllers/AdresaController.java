@@ -3,6 +3,7 @@ package com.project.controllers;
 import com.project.dtos.adresa.AdresaRequestDto;
 import com.project.dtos.adresa.AdresaResponseDto;
 import com.project.serviceinterfaces.AdresaService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,11 +39,10 @@ public class AdresaController {
         try {
             AdresaResponseDto adresaResponseDto = adresaService.findOneById(id);
 
-            if (adresaResponseDto == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
 
             return new ResponseEntity<>(adresaResponseDto, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

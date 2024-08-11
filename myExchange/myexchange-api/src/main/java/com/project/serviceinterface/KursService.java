@@ -11,8 +11,6 @@ public interface KursService {
 
     KursResponseDto findById(Integer id);
 
-    KursResponseDto findByKursnaListaAndValuta(Integer kursnaListaId, String valuta);
-
     KursRequestDto create(KursRequestDto kursRequestDto, Integer listaId);
 
 }

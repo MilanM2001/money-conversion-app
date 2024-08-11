@@ -7,17 +7,14 @@ import com.project.domain.repositoryinterfaces.KursnaListaRepository;
 import com.project.dtos.kurs.KursRequestDto;
 import com.project.dtos.kurs.KursResponseDto;
 import com.project.enums.StatusKursneListe;
-import com.project.enums.Valuta;
 import com.project.exceptions.EntityNotAccessibleException;
-import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterface.KursService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.MethodNotAllowedException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,9 +34,8 @@ public class KursServiceImpl implements KursService {
     @Override
     public List<KursResponseDto> findAll() {
         List<Kurs> kursevi = kursRepository.findAll();
-        List<KursResponseDto> kurseviDto = modelMapper.map(kursevi, new TypeToken<List<KursResponseDto>>() {}.getType());
 
-        return kurseviDto;
+        return modelMapper.map(kursevi, new TypeToken<List<KursResponseDto>>() {}.getType());
     }
 
     @Override
@@ -50,22 +46,7 @@ public class KursServiceImpl implements KursService {
             throw new EntityNotFoundException("Cannot find kurs with id " + id);
         }
 
-        KursResponseDto kursDto = modelMapper.map(kurs, KursResponseDto.class);
-
-        return kursDto;
-    }
-
-    @Override
-    public KursResponseDto findByKursnaListaAndValuta(Integer kursnaListaId, String valuta) {
-        Kurs kurs = kursRepository.findByKursnaListaAndValuta(kursnaListaId, valuta);
-
-        if (kurs == null) {
-            throw new EntityNotFoundException("Cannot find kurs with id " + kursnaListaId + " and valuta " + valuta);
-        }
-
-        KursResponseDto kursDto = modelMapper.map(kurs, KursResponseDto.class);
-
-        return kursDto;
+        return modelMapper.map(kurs, KursResponseDto.class);
     }
 
     @Override

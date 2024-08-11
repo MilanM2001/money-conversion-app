@@ -6,8 +6,9 @@ import com.project.domain.repositoryinterfaces.KlijentRepository;
 import com.project.dtos.klijentInfo.KlijentInfoRequestDto;
 import com.project.dtos.klijentInfo.KlijentInfoResponseDto;
 import com.project.dtos.klijentInfo.KlijentInfoUpdateDto;
-import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.KlijentInfoService;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,25 +33,26 @@ public class KlijentInfoServiceImpl implements KlijentInfoService {
     @Override
     public List<KlijentInfoResponseDto> findAll() {
         List<KlijentInfo> klijentInfos = klijentInfoRepository.findAll();
-        List<KlijentInfoResponseDto> klijentInfoResponseDtos = modelMapper.map(klijentInfos, new TypeToken<List<KlijentInfoResponseDto>>() {}.getType());
-        return klijentInfoResponseDtos;
+
+        return modelMapper.map(klijentInfos, new TypeToken<List<KlijentInfoResponseDto>>() {}.getType());
     }
 
     @Override
     public KlijentInfoResponseDto findOneByJmbg(String jmbg) {
         KlijentInfo klijentInfo = klijentInfoRepository.findOneByJmbg(jmbg);
+
         if (klijentInfo == null) {
-            return null;
+            throw new EntityNotFoundException("Klijent with JMBG " + jmbg + " not found");
         }
-        KlijentInfoResponseDto klijentInfoResponseDto = modelMapper.map(klijentInfo, KlijentInfoResponseDto.class);
-        return klijentInfoResponseDto;
+
+        return modelMapper.map(klijentInfo, KlijentInfoResponseDto.class);
     }
 
     @Override
     public KlijentInfoRequestDto create(KlijentInfoRequestDto klijentInfoRequestDto) {
 
         if (klijentInfoRepository.findOneByJmbg(klijentInfoRequestDto.getJmbg()) != null) {
-            return null;
+            throw new EntityExistsException("Client with jmbg " + klijentInfoRequestDto.getJmbg() + " already exists");
         }
 
         KlijentInfo klijentInfo = modelMapper.map(klijentInfoRequestDto, KlijentInfo.class);

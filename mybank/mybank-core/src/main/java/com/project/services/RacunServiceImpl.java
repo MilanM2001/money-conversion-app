@@ -6,20 +6,15 @@ import com.project.dtos.racun.RacunDepositDto;
 import com.project.dtos.racun.RacunResponseDto;
 import com.project.dtos.racun.RacunWithdrawDto;
 import com.project.enums.StatusRacuna;
-import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.RacunService;
 import jakarta.persistence.criteria.Predicate;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,9 +33,8 @@ public class RacunServiceImpl implements RacunService {
     @Override
     public List<RacunResponseDto> findAll() {
         List<Racun> racuni = racunRepository.findAll();
-        List<RacunResponseDto> racuniDto = modelMapper.map(racuni, new TypeToken<List<RacunResponseDto>>() {}.getType());
 
-        return racuniDto;
+        return modelMapper.map(racuni, new TypeToken<List<RacunResponseDto>>() {}.getType());
     }
 
     @Override
@@ -74,52 +68,7 @@ public class RacunServiceImpl implements RacunService {
     @Override
     public List<RacunResponseDto> findByClientsEmail(String email) {
         List<Racun> racuni = racunRepository.findByClientsEmail(email);
-        List<RacunResponseDto> racuniDto = modelMapper.map(racuni, new TypeToken<List<RacunResponseDto>>() {}.getType());
 
-        return racuniDto;
-    }
-
-    @Override
-    public RacunDepositDto deposit(RacunDepositDto racunDepositDto, String brojRacuna) {
-        Racun racun = racunRepository.findByBrojRacuna(brojRacuna);
-
-        if (racun == null) {
-            throw new EntityNotFoundException("Racun with the provided broj racuna does not exist: " + brojRacuna);
-        }
-
-        if (racun.getStatusRacuna().equals(StatusRacuna.AKTIVAN) || racun.getStatusRacuna().equals(StatusRacuna.KREIRAN)) {
-            return null;
-        }
-
-        racun.setTrenutniIznos(+racunDepositDto.getIznos());
-        racunRepository.save(racun);
-
-        return racunDepositDto;
-    }
-
-    @Override
-    public RacunWithdrawDto withdraw(RacunWithdrawDto racunWithdrawDto, String brojRacuna) {
-        Racun racun = racunRepository.findByBrojRacuna(brojRacuna);
-
-        if (racun == null) {
-            throw new EntityNotFoundException("Racun with the provided broj racuna does not exist: " + brojRacuna);
-        }
-
-        if (racun.getStatusRacuna().equals(StatusRacuna.NEAKTIVAN) || racun.getStatusRacuna().equals(StatusRacuna.ZATVOREN)) {
-            return null;
-        }
-
-        double iznos = racunWithdrawDto.getIznos();
-        double trenutnoStanje = racun.getTrenutniIznos();
-        double novoStanje = trenutnoStanje - iznos;
-
-        if (novoStanje < 0) {
-            return null;
-        }
-
-        racun.setTrenutniIznos(novoStanje);
-        racunRepository.save(racun);
-
-        return racunWithdrawDto;
+        return modelMapper.map(racuni, new TypeToken<List<RacunResponseDto>>() {}.getType());
     }
 }

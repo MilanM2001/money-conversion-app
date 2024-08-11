@@ -4,16 +4,15 @@ import com.project.dtos.konverzija.KonverzijaRequestDto;
 import com.project.dtos.konverzija.KonverzijaResponseDto;
 import com.project.dtos.kursnalista.KursnaListaRequestDto;
 import com.project.dtos.kursnalista.KursnaListaResponseDto;
-import com.project.exceptions.EntityAlreadyExistsException;
-import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterface.KursnaListaService;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -70,7 +69,7 @@ public class KursnaListaController {
             return new ResponseEntity<>(kursnaListaDto, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (EntityAlreadyExistsException e) {
+        } catch (EntityExistsException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
     }
@@ -92,9 +91,7 @@ public class KursnaListaController {
     @PostMapping("/exchange")
     public KonverzijaResponseDto exchange(@RequestBody KonverzijaRequestDto konverzijaRequestDto) {
         try {
-            KonverzijaResponseDto konverzijaResponseDto = kursnaListaService.exchange(konverzijaRequestDto);
-
-            return konverzijaResponseDto;
+            return kursnaListaService.exchange(konverzijaRequestDto);
         } catch (EntityNotFoundException e) {
             e.getMessage();
             return null;

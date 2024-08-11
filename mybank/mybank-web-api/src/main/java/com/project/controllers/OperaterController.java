@@ -5,11 +5,11 @@ import com.project.dtos.klijentInfo.KlijentInfoRequestDto;
 import com.project.dtos.klijentInfo.KlijentInfoUpdateDto;
 import com.project.dtos.operater.OperaterRequestDto;
 import com.project.dtos.operater.OperaterResponseDto;
-import com.project.exceptions.EntityAlreadyExistsException;
-import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.KlijentInfoService;
 import com.project.serviceinterfaces.KlijentService;
 import com.project.serviceinterfaces.OperaterService;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,11 +47,10 @@ public class OperaterController {
     public ResponseEntity<OperaterResponseDto> findByEmail(@PathVariable("email") String email) {
         try {
             OperaterResponseDto operaterResponseDto = operaterService.findOneByEmail(email);
-            if (operaterResponseDto == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
 
             return new ResponseEntity<>(operaterResponseDto, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -99,7 +98,7 @@ public class OperaterController {
 
         } catch (EntityNotFoundException ex) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (EntityAlreadyExistsException ex) {
+        } catch (EntityExistsException ex) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

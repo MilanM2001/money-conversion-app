@@ -3,10 +3,9 @@ package com.project.controllers;
 import com.project.dtos.transakcija.TransakcijaRequestDto;
 import com.project.dtos.transakcija.TransakcijaResponseDto;
 import com.project.exceptions.CurrencyException;
-import com.project.exceptions.EntityNotFoundException;
 import com.project.exceptions.NegativeBalanceException;
 import com.project.serviceinterfaces.TransakcijaService;
-import jakarta.validation.Valid;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +56,8 @@ public class TranskacijaController {
             List<TransakcijaResponseDto> transakcijeDto = transkacijaService.findAllByKlijentEmail(email, sortBy);
 
             return new ResponseEntity<>(transakcijeDto, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -12,9 +12,9 @@ import com.project.enums.StatusRacuna;
 import com.project.enums.StatusZahteva;
 import com.project.enums.TipRacuna;
 import com.project.enums.TipZahteva;
-import com.project.exceptions.EntityAlreadyExistsException;
-import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.ZahtevService;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,25 +46,22 @@ public class ZahtevServiceImpl implements ZahtevService {
     @Override
     public List<ZahtevResponseDto> findAll() {
         List<Zahtev> zahtevi = zahtevRepository.findAll();
-        List<ZahtevResponseDto> zahteviDto = modelMapper.map(zahtevi, new TypeToken<List<ZahtevResponseDto>>() {}.getType());
 
-        return zahteviDto;
+        return modelMapper.map(zahtevi, new TypeToken<List<ZahtevResponseDto>>() {}.getType());
     }
 
     @Override
     public List<ZahtevResponseDto> findAllNonDecided() {
         List<Zahtev> zahtevi = zahtevRepository.findAllNonDecided();
-        List<ZahtevResponseDto> zahteviDto = modelMapper.map(zahtevi, new TypeToken<List<ZahtevResponseDto>>() {}.getType());
 
-        return zahteviDto;
+        return modelMapper.map(zahtevi, new TypeToken<List<ZahtevResponseDto>>() {}.getType());
     }
 
     @Override
     public List<ZahtevResponseDto> findByClientsEmail(String email) {
         List<Zahtev> zahtevi = zahtevRepository.findByClientEmail(email);
-        List<ZahtevResponseDto> zahteviDto = modelMapper.map(zahtevi, new TypeToken<List<ZahtevResponseDto>>() {}.getType());
 
-        return zahteviDto;
+        return modelMapper.map(zahtevi, new TypeToken<List<ZahtevResponseDto>>() {}.getType());
     }
 
     @Override
@@ -74,7 +71,7 @@ public class ZahtevServiceImpl implements ZahtevService {
         Racun racun = racunRepository.findByBrojRacuna(zahtevRequestDto.getBrojRacuna());
 
         if (racun != null) {
-            throw new EntityAlreadyExistsException("Racun with the given broj racuna already exists: " + zahtevRequestDto.getBrojRacuna());
+            throw new EntityExistsException("Racun with the given broj racuna already exists: " + zahtevRequestDto.getBrojRacuna());
         }
 
         if (klijent == null) {
@@ -131,9 +128,7 @@ public class ZahtevServiceImpl implements ZahtevService {
 
         zahtevRepository.save(zahtev);
 
-        ZahtevResponseDto zahtevDto = modelMapper.map(zahtev, ZahtevResponseDto.class);
-
-        return zahtevDto;
+        return modelMapper.map(zahtev, ZahtevResponseDto.class);
     }
 
     //Operater donosi odluku o klijentovom zahtevu za zatvaranje ili otvaranje racuna,

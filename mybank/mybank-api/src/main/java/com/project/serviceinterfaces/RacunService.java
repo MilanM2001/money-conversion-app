@@ -13,9 +13,4 @@ public interface RacunService {
     List<RacunResponseDto> findAllFiltered(String klijentEmail, String statusRacuna, LocalDate datumPoslednjePromene);
 
     List<RacunResponseDto> findByClientsEmail(String email);
-
-    RacunDepositDto deposit(RacunDepositDto racunDepositDto, String brojRacuna);
-
-    RacunWithdrawDto withdraw(RacunWithdrawDto racunWithdrawDto, String brojRacuna);
-
 }

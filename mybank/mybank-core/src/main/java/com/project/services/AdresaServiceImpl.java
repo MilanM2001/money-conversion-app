@@ -5,6 +5,7 @@ import com.project.domain.repositoryinterfaces.AdresaRepository;
 import com.project.dtos.adresa.AdresaRequestDto;
 import com.project.dtos.adresa.AdresaResponseDto;
 import com.project.serviceinterfaces.AdresaService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,26 +29,26 @@ public class AdresaServiceImpl implements AdresaService {
     @Override
     public List<AdresaResponseDto> findAll() {
         List<Adresa> adrese = adresaRepository.findAll();
-        List<AdresaResponseDto> adreseDto = modelMapper.map(adrese, new TypeToken<List<AdresaResponseDto>>() {}.getType());
 
-        return adreseDto;
+        return modelMapper.map(adrese, new TypeToken<List<AdresaResponseDto>>() {}.getType());
     }
 
     @Override
     public AdresaResponseDto findOneById(Integer id) {
         Adresa adresa = adresaRepository.findOneById(id);
-        if (adresa == null) {
-            return null;
-        }
-        AdresaResponseDto adresaResponseDto = modelMapper.map(adresa, AdresaResponseDto.class);
 
-        return adresaResponseDto;
+        if (adresa == null) {
+            throw new EntityNotFoundException("Cannot find adresa with id " + id);
+        }
+
+        return modelMapper.map(adresa, AdresaResponseDto.class);
     }
 
     @Override
     public AdresaRequestDto create(AdresaRequestDto adresaRequestDto) {
         Adresa adresa = modelMapper.map(adresaRequestDto, Adresa.class);
         adresaRepository.save(adresa);
+
         return adresaRequestDto;
     }
 }

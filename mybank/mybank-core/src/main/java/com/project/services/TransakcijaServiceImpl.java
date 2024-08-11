@@ -14,16 +14,15 @@ import com.project.enums.StatusRacuna;
 import com.project.enums.StatusTransakcije;
 import com.project.enums.TipTransakcije;
 import com.project.exceptions.CurrencyException;
-import com.project.exceptions.EntityNotFoundException;
 import com.project.exceptions.NegativeBalanceException;
 import com.project.exceptions.RacunClosedException;
 import com.project.serviceinterfaces.TransakcijaService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -72,6 +71,11 @@ public class TransakcijaServiceImpl implements TransakcijaService {
     public List<TransakcijaResponseDto> findAllByKlijentEmail(String email, String sortBy) {
         Sort sort = getSortByParameter(sortBy);
         Klijent klijent = klijentRepository.findOneByEmail(email);
+
+        if (klijent == null) {
+            throw new EntityNotFoundException("Cannot find client with email: " + email);
+        }
+
         List<Transakcija> transakcije = transakcijaRepository.findAllByKlijentEmail(klijent, sort);
 
         return modelMapper.map(transakcije, new TypeToken<List<TransakcijaResponseDto>>() {}.getType());

@@ -9,12 +9,11 @@ import com.project.domain.repositoryinterfaces.KlijentRepository;
 import com.project.domain.repositoryinterfaces.RacunRepository;
 import com.project.dtos.klijent.KlijentResponseDto;
 import com.project.dtos.klijent.KlijentRequestDto;
-import com.project.dtos.racun.RacunResponseDto;
 import com.project.enums.StatusRacuna;
-import com.project.exceptions.EntityAlreadyExistsException;
 import com.project.exceptions.EntityCannotBeDeletedException;
-import com.project.exceptions.EntityNotFoundException;
 import com.project.serviceinterfaces.KlijentService;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +41,8 @@ public class KlijentServiceImpl implements KlijentService {
     @Override
     public List<KlijentResponseDto> findAll() {
         List<Klijent> klijenti = klijentRepository.findAll();
-        List<KlijentResponseDto> klijentiDto = modelMapper.map(klijenti, new TypeToken<List<KlijentResponseDto>>() {}.getType());
 
-        return klijentiDto;
+        return modelMapper.map(klijenti, new TypeToken<List<KlijentResponseDto>>() {}.getType());
     }
 
     @Override
@@ -55,9 +53,7 @@ public class KlijentServiceImpl implements KlijentService {
             throw new EntityNotFoundException("Client with the given email does not exist: " + email);
         }
 
-        KlijentResponseDto klijentResponseDto = modelMapper.map(klijent, KlijentResponseDto.class);
-
-        return klijentResponseDto;
+        return modelMapper.map(klijent, KlijentResponseDto.class);
     }
 
     @Override
@@ -70,7 +66,7 @@ public class KlijentServiceImpl implements KlijentService {
 
         //Throw exception if a Client already exists with the given email
         if (klijentRepository.findOneByEmail(klijentRequestDto.getEmail()) != null) {
-            throw new EntityAlreadyExistsException("Client with the given email already exists: " + klijentRequestDto.getEmail());
+            throw new EntityExistsException("Client with the given email already exists: " + klijentRequestDto.getEmail());
         }
 
         KlijentInfo klijentInfo = klijentInfoRepository.findOneByJmbg(klijentRequestDto.getJmbg());

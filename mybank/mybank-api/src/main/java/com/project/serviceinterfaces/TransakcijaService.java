@@ -12,5 +12,7 @@ public interface TransakcijaService {
 
     List<TransakcijaResponseDto> findAllByKlijentEmail(String email, String sortBy);
 
-    TransakcijaResponseDto transakcija(TransakcijaRequestDto transakcijaRequestDto, String klijentEmail, String brojRacunaUplate, String brojRacunaIsplate);
+    TransakcijaResponseDto transakcija(TransakcijaRequestDto transakcijaRequestDto,
+                                       String klijentEmail, String brojRacunaUplate,
+                                       String brojRacunaIsplate);
 }
