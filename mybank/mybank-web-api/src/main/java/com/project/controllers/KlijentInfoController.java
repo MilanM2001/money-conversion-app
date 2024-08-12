@@ -1,6 +1,7 @@
 package com.project.controllers;
 
 import com.project.dtos.klijentInfo.KlijentInfoResponseDto;
+import com.project.exceptions.EntityCannotBeDeletedException;
 import com.project.serviceinterfaces.KlijentInfoService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;

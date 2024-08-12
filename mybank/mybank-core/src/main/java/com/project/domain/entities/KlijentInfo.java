@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -33,9 +35,18 @@ public class KlijentInfo {
     private String status;
 
     @Column(name = "version", nullable = false)
-    private String version;
+    private double version;
 
-//    @OneToOne(mappedBy = "klijentInfo", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    private Klijent klijent;
+    @Column(name = "datum_kreiranja", nullable = false)
+    private LocalDate datumKreiranja;
 
+    @Column(name = "datum_promene", nullable = false)
+    private LocalDate datumPromene;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted;
+
+    @ManyToOne(targetEntity = Operater.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "operater_id")
+    private Operater operater;
 }

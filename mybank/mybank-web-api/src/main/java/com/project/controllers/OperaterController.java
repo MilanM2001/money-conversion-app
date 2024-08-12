@@ -10,6 +10,7 @@ import com.project.serviceinterfaces.KlijentService;
 import com.project.serviceinterfaces.OperaterService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,11 +63,9 @@ public class OperaterController {
         try {
             OperaterRequestDto operater = operaterService.create(operaterRequestDto);
 
-            if (operater == null) {
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-            }
-
             return new ResponseEntity<>(operater, HttpStatus.CREATED);
+        } catch (EntityExistsException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -78,11 +77,9 @@ public class OperaterController {
         try {
             KlijentInfoRequestDto klijentInfo = klijentInfoService.create(klijentInfoRequestDto);
 
-            if (klijentInfo == null) {
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-            }
-
             return new ResponseEntity<>(klijentInfo, HttpStatus.CREATED);
+        } catch (EntityExistsException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -90,7 +87,7 @@ public class OperaterController {
 
     //Operater kreira nalog klijenta
     @PostMapping("/createClient")
-    public ResponseEntity<KlijentRequestDto> createClient(@RequestBody KlijentRequestDto klijentRequestDto) {
+    public ResponseEntity<KlijentRequestDto> createClient(@RequestBody @Valid KlijentRequestDto klijentRequestDto) {
         try {
             KlijentRequestDto klijent = klijentService.create(klijentRequestDto);
 
@@ -107,7 +104,7 @@ public class OperaterController {
 
     //Operater upravlja/menja podacima klijenta
     @PutMapping("/updateClientInfo/{jmbg}")
-    public ResponseEntity<KlijentInfoUpdateDto> updateClientInfo(@RequestBody KlijentInfoUpdateDto klijentInfoUpdateDto, @PathVariable("jmbg") String jmbg) {
+    public ResponseEntity<KlijentInfoUpdateDto> updateClientInfo(@RequestBody @Valid KlijentInfoUpdateDto klijentInfoUpdateDto, @PathVariable("jmbg") String jmbg) {
         try {
             KlijentInfoUpdateDto updateKlijent = klijentInfoService.update(klijentInfoUpdateDto, jmbg);
 

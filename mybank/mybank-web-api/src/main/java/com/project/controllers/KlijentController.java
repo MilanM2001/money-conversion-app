@@ -49,6 +49,7 @@ public class KlijentController {
         }
     }
 
+    //Operater brise klijenta, ne moze da ga brise ako postoje racuni koji nisu u statusu ZATVOREN
     @DeleteMapping("/delete/{jmbg}")
     public ResponseEntity<String> deleteByJMBG(@PathVariable("jmbg") String jmbg) {
         try {

@@ -19,6 +19,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -75,6 +76,7 @@ public class KlijentServiceImpl implements KlijentService {
         klijent.setKlijentInfo(klijentInfo);
         klijent.setEmail(klijentRequestDto.getEmail());
         klijent.setPassword(klijentRequestDto.getPassword());
+        klijentInfo.setOperater(null);
 
         klijentRepository.save(klijent);
 
@@ -99,7 +101,12 @@ public class KlijentServiceImpl implements KlijentService {
 
         KlijentInfo klijentInfo = klijentInfoRepository.findOneByJmbg(jmbg);
 
-        klijentRepository.delete(klijent);
-        klijentInfoRepository.delete(klijentInfo);
+        double newVersion = klijentInfo.getVersion() + 1;
+        klijentInfo.setVersion(newVersion);
+        klijentInfo.setDatumPromene(LocalDate.now());
+        klijentInfo.setDeleted(true);
+        klijentInfo.setOperater(null);
+
+        klijentInfoRepository.save(klijentInfo);
     }
 }

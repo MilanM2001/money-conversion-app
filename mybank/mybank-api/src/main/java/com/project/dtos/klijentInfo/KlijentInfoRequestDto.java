@@ -23,10 +23,4 @@ public class KlijentInfoRequestDto {
 
     @NotBlank(message = "Broj telefona je obavezan")
     private String brojTelefona;
-
-    @NotBlank(message = "Status je obavezan")
-    private String status;
-
-    @NotBlank(message = "Version je obavezna")
-    private String version;
 }

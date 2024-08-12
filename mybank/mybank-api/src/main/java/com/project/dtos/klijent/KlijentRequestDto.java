@@ -10,12 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class KlijentRequestDto {
 
-    @NotBlank(message = "Email je obavezan")
+    @NotBlank(message = "email je obavezan")
     private String email;
 
-    @NotBlank(message = "Password je obavezan")
+    @NotBlank(message = "password je obavezan")
     private String password;
 
-    @NotBlank(message = "JMBG je obavezan")
+    @NotBlank(message = "jmbg je obavezan")
     private String jmbg;
 }

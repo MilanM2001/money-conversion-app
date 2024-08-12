@@ -1,8 +1,10 @@
 package com.project.services;
 
 import com.project.domain.entities.KlijentInfo;
+import com.project.domain.entities.Racun;
 import com.project.domain.repositoryinterfaces.KlijentInfoRepository;
 import com.project.domain.repositoryinterfaces.KlijentRepository;
+import com.project.domain.repositoryinterfaces.RacunRepository;
 import com.project.dtos.klijentInfo.KlijentInfoRequestDto;
 import com.project.dtos.klijentInfo.KlijentInfoResponseDto;
 import com.project.dtos.klijentInfo.KlijentInfoUpdateDto;
@@ -14,6 +16,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -22,12 +25,14 @@ public class KlijentInfoServiceImpl implements KlijentInfoService {
     KlijentRepository klijentRepository;
     KlijentInfoRepository klijentInfoRepository;
     ModelMapper modelMapper;
+    RacunRepository racunRepository;
 
     @Autowired
-    public KlijentInfoServiceImpl(KlijentInfoRepository klijentInfoRepository, KlijentRepository klijentRepository) {
+    public KlijentInfoServiceImpl(KlijentInfoRepository klijentInfoRepository, KlijentRepository klijentRepository, RacunRepository racunRepository) {
         this.klijentInfoRepository = klijentInfoRepository;
         this.modelMapper = new ModelMapper();
         this.klijentRepository = klijentRepository;
+        this.racunRepository = racunRepository;
     }
 
     @Override
@@ -56,7 +61,12 @@ public class KlijentInfoServiceImpl implements KlijentInfoService {
         }
 
         KlijentInfo klijentInfo = modelMapper.map(klijentInfoRequestDto, KlijentInfo.class);
+        klijentInfo.setDeleted(false);
+        klijentInfo.setVersion(0);
+        klijentInfo.setDatumKreiranja(LocalDate.now());
+        klijentInfo.setDatumPromene(LocalDate.now());
         klijentInfoRepository.save(klijentInfo);
+
         return klijentInfoRequestDto;
     }
 
@@ -72,6 +82,9 @@ public class KlijentInfoServiceImpl implements KlijentInfoService {
         klijentInfo.setIme(klijentInfoUpdateDto.getIme());
         klijentInfo.setPrezime(klijentInfoUpdateDto.getPrezime());
         klijentInfo.setBrojTelefona(klijentInfoUpdateDto.getBrojTelefona());
+        double newVersion = klijentInfo.getVersion() + 1;
+        klijentInfo.setVersion(newVersion);
+        klijentInfo.setDatumPromene(LocalDate.now());
 
         klijentInfoRepository.save(klijentInfo);
 
