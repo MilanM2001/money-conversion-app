@@ -1,7 +1,10 @@
 package com.project.controllers;
 
 import com.project.dtos.racun.RacunResponseDto;
+import com.project.dtos.racun.RacunUpdateDto;
+import com.project.exceptions.EntityStatusException;
 import com.project.serviceinterfaces.RacunService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -58,6 +61,22 @@ public class RacunController {
             List<RacunResponseDto> racuniDto = racunService.findByClientsEmail(email);
 
             return new ResponseEntity<>(racuniDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //Racun moze da se update samo ako je u statusu KREIRAN
+    @PutMapping("/update/{brojRacuna}")
+    public ResponseEntity<RacunUpdateDto> update(@RequestBody RacunUpdateDto racunUpdateDto, @PathVariable("brojRacuna") String brojRacuna) {
+        try {
+            RacunUpdateDto racunUpdate = racunService.update(racunUpdateDto, brojRacuna);
+
+            return new ResponseEntity<>(racunUpdate, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (EntityStatusException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

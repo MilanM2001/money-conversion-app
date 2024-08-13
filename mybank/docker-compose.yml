@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+
+  mybank_db:
+    image: postgres
+    container_name: mybank_db
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mybank_db
+    ports:
+      - "5432:5432"
+    networks:
+      - network
+    volumes:
+      - mybank_db:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - mybank_db
+    networks:
+      - network
+
+volumes:
+  mybank_db:
+
+networks:
+  network:
+    driver: bridge

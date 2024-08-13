@@ -8,6 +8,7 @@ import com.project.domain.repositoryinterfaces.RacunRepository;
 import com.project.dtos.klijentInfo.KlijentInfoRequestDto;
 import com.project.dtos.klijentInfo.KlijentInfoResponseDto;
 import com.project.dtos.klijentInfo.KlijentInfoUpdateDto;
+import com.project.enums.StatusKlijenta;
 import com.project.serviceinterfaces.KlijentInfoService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -61,10 +62,10 @@ public class KlijentInfoServiceImpl implements KlijentInfoService {
         }
 
         KlijentInfo klijentInfo = modelMapper.map(klijentInfoRequestDto, KlijentInfo.class);
-        klijentInfo.setDeleted(false);
         klijentInfo.setVersion(0);
         klijentInfo.setDatumKreiranja(LocalDate.now());
         klijentInfo.setDatumPromene(LocalDate.now());
+        klijentInfo.setStatus(StatusKlijenta.AKTIVAN);
         klijentInfoRepository.save(klijentInfo);
 
         return klijentInfoRequestDto;

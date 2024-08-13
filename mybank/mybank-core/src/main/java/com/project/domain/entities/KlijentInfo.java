@@ -1,11 +1,14 @@
 package com.project.domain.entities;
 
+import com.project.enums.StatusKlijenta;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+
+import static jakarta.persistence.EnumType.STRING;
 
 @Entity
 @Data
@@ -32,7 +35,8 @@ public class KlijentInfo {
     private String brojTelefona;
 
     @Column(name = "status", nullable = false)
-    private String status;
+    @Enumerated(STRING)
+    private StatusKlijenta status;
 
     @Column(name = "version", nullable = false)
     private double version;
@@ -43,10 +47,7 @@ public class KlijentInfo {
     @Column(name = "datum_promene", nullable = false)
     private LocalDate datumPromene;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted;
-
-    @ManyToOne(targetEntity = Operater.class, fetch = FetchType.EAGER)
-    @JoinColumn(name = "operater_id")
-    private Operater operater;
+//    @ManyToOne(targetEntity = Operater.class, fetch = FetchType.EAGER)
+//    @JoinColumn(name = "operater_id")
+//    private Operater operater;
 }

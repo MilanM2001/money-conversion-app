@@ -137,9 +137,11 @@ public class TransakcijaServiceImpl implements TransakcijaService {
         transakcijaRepository.save(transakcija);
 
         double noviIznos = racunUplate.getTrenutniIznos() + transakcijaRequestDto.getIznosTransakcije();
+        double newVersion = racunUplate.getVersion() + 1;
 
         racunUplate.setTrenutniIznos(noviIznos);
         racunUplate.setDatumPoslednjePromene(LocalDate.now());
+        racunUplate.setVersion(newVersion);
 
         racunRepository.save(racunUplate);
 
@@ -168,6 +170,7 @@ public class TransakcijaServiceImpl implements TransakcijaService {
         transakcijaRepository.save(transakcija);
 
         double noviIznos = racunIsplate.getTrenutniIznos() - transakcijaRequestDto.getIznosTransakcije();
+        double newVersion = racunIsplate.getVersion() + 1;
 
         if (noviIznos < 0) {
             throw new NegativeBalanceException("Not enough balance");
@@ -175,6 +178,7 @@ public class TransakcijaServiceImpl implements TransakcijaService {
 
         racunIsplate.setTrenutniIznos(noviIznos);
         racunIsplate.setDatumPoslednjePromene(LocalDate.now());
+        racunIsplate.setVersion(newVersion);
 
         racunRepository.save(racunIsplate);
 
@@ -222,14 +226,19 @@ public class TransakcijaServiceImpl implements TransakcijaService {
         double noviIznosRacunUplate = konverzijaResponseDto.getKonvertovaniIznos() + racunUplate.getTrenutniIznos();
         double noviIznosRacunIsplate = racunIsplate.getTrenutniIznos() - transakcijaRequestDto.getIznosTransakcije();
 
+        double racunUplateNewVersion = racunUplate.getVersion() + 1;
+        double racunIsplateNewVersion = racunIsplate.getVersion() + 1;
+
         //Racun uplate se menja, dodaje mu se konvertovana suma
         racunUplate.setTrenutniIznos(noviIznosRacunUplate);
         racunUplate.setDatumPoslednjePromene(LocalDate.now());
+        racunUplate.setVersion(racunUplateNewVersion);
         racunRepository.save(racunUplate);
 
         //Racun isplate se menja, oduzima mu se vrednost iz transakcije
         racunIsplate.setTrenutniIznos(noviIznosRacunIsplate);
         racunIsplate.setDatumPoslednjePromene(LocalDate.now());
+        racunIsplate.setVersion(racunIsplateNewVersion);
         racunRepository.save(racunIsplate);
 
         //Transakcija se kreira i dodaje

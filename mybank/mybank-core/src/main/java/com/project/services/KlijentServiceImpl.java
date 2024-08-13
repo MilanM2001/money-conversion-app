@@ -76,7 +76,7 @@ public class KlijentServiceImpl implements KlijentService {
         klijent.setKlijentInfo(klijentInfo);
         klijent.setEmail(klijentRequestDto.getEmail());
         klijent.setPassword(klijentRequestDto.getPassword());
-        klijentInfo.setOperater(null);
+//        klijentInfo.setOperater(null);
 
         klijentRepository.save(klijent);
 
@@ -104,8 +104,6 @@ public class KlijentServiceImpl implements KlijentService {
         double newVersion = klijentInfo.getVersion() + 1;
         klijentInfo.setVersion(newVersion);
         klijentInfo.setDatumPromene(LocalDate.now());
-        klijentInfo.setDeleted(true);
-        klijentInfo.setOperater(null);
 
         klijentInfoRepository.save(klijentInfo);
     }

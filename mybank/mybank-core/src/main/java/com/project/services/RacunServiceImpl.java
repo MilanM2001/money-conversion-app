@@ -2,11 +2,12 @@ package com.project.services;
 
 import com.project.domain.entities.Racun;
 import com.project.domain.repositoryinterfaces.RacunRepository;
-import com.project.dtos.racun.RacunDepositDto;
 import com.project.dtos.racun.RacunResponseDto;
-import com.project.dtos.racun.RacunWithdrawDto;
+import com.project.dtos.racun.RacunUpdateDto;
 import com.project.enums.StatusRacuna;
+import com.project.exceptions.EntityStatusException;
 import com.project.serviceinterfaces.RacunService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -70,5 +71,24 @@ public class RacunServiceImpl implements RacunService {
         List<Racun> racuni = racunRepository.findByClientsEmail(email);
 
         return modelMapper.map(racuni, new TypeToken<List<RacunResponseDto>>() {}.getType());
+    }
+
+    @Override
+    public RacunUpdateDto update(RacunUpdateDto racunUpdateDto, String brojRacuna) {
+        Racun racun = racunRepository.findByBrojRacuna(brojRacuna);
+
+        if (racun == null) {
+            throw new EntityNotFoundException("Cannot find racun with broj: " + brojRacuna);
+        } else if (racun.getStatusRacuna() != StatusRacuna.KREIRAN) {
+            throw new EntityStatusException("Racun is not in status KREIRAN");
+        }
+
+        racun.setNazivBanke(racunUpdateDto.getNazivBanke());
+        racun.setTipRacuna(racunUpdateDto.getTipRacuna());
+        racun.setValuta(racunUpdateDto.getValuta());
+
+        racunRepository.save(racun);
+
+        return null;
     }
 }

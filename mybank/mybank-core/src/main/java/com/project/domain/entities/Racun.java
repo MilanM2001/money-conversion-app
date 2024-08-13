@@ -53,7 +53,7 @@ public class Racun {
     private LocalDate datumPoslednjePromene;
 
     @Column(name = "version", nullable = false)
-    private String version;
+    private double version;
 
     @ManyToOne(targetEntity = Klijent.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "klijent_email")

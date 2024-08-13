@@ -176,7 +176,7 @@ public class ZahtevServiceImpl implements ZahtevService {
                 racun.setStatusRacuna(StatusRacuna.AKTIVAN);
                 racun.setDatumKreiranja(LocalDate.now());
                 racun.setDatumPoslednjePromene(LocalDate.now());
-                racun.setVersion("0");
+                racun.setVersion(0);
                 racun.setKlijent(zahtev.getPodnosilacZahteva());
 
                 racunRepository.save(racun);

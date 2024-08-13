@@ -23,6 +23,6 @@ public class RacunResponseDto {
     private StatusRacuna statusRacuna;
     private LocalDate datumKreiranja;
     private LocalDate datumPoslednjePromene;
-    private String version;
+    private double version;
     private KlijentResponseDto klijent;
 }
