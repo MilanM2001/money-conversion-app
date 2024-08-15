@@ -59,9 +59,13 @@ public class KlijentInfoServiceImpl implements KlijentInfoService {
 
         if (klijentInfoRepository.findOneByJmbg(klijentInfoRequestDto.getJmbg()) != null) {
             throw new EntityExistsException("Client with jmbg " + klijentInfoRequestDto.getJmbg() + " already exists");
+        } else if (klijentInfoRequestDto.getAdresaId() == null) {
+            throw new EntityNotFoundException("Adresa Id not found");
         }
 
+
         KlijentInfo klijentInfo = modelMapper.map(klijentInfoRequestDto, KlijentInfo.class);
+
         klijentInfo.setVersion(0);
         klijentInfo.setDatumKreiranja(LocalDate.now());
         klijentInfo.setDatumPromene(LocalDate.now());

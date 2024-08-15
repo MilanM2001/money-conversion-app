@@ -57,6 +57,7 @@ public class KursServiceImpl implements KursService {
             throw new EntityNotFoundException("Cannot find kursna lista with id " + listaId);
         }
 
+        //U kursnu listu ne mogu da se dodaju kursevi ako nije u stanju KREIRANA
         if (!kursnaLista.getStatus().equals(StatusKursneListe.KREIRANA)) {
             throw new EntityNotAccessibleException("Kursna Lista is not accessible because the status is not 'KREIRANA'");
         }

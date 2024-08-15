@@ -23,9 +23,12 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -112,9 +115,6 @@ public class TransakcijaServiceImpl implements TransakcijaService {
 
     }
 
-
-    //TODO
-    //Proveriti i uporediti valute racuna uplate i transakcije i onda kasnije konvertovati ako treba
     private TransakcijaResponseDto deposit(TransakcijaRequestDto transakcijaRequestDto, Klijent klijent, String brojRacunaUplate) {
         Racun racunUplate = findActiveRacunByBrojRacuna(brojRacunaUplate);
 
@@ -222,6 +222,10 @@ public class TransakcijaServiceImpl implements TransakcijaService {
                 .body(konverzijaRequestDto)
                 .retrieve()
                 .body(KonverzijaResponseDto.class);
+
+        if (konverzijaResponseDto == null) {
+            throw new RestClientResponseException("Error in MyExchange service", 502, "error in myexchange service", null, "error in my exchange service".getBytes(), Charset.defaultCharset());
+        }
 
         double noviIznosRacunUplate = konverzijaResponseDto.getKonvertovaniIznos() + racunUplate.getTrenutniIznos();
         double noviIznosRacunIsplate = racunIsplate.getTrenutniIznos() - transakcijaRequestDto.getIznosTransakcije();

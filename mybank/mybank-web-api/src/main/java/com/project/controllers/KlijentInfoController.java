@@ -60,6 +60,8 @@ public class KlijentInfoController {
             return new ResponseEntity<>(klijentInfo, HttpStatus.CREATED);
         } catch (EntityExistsException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

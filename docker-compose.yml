@@ -11,11 +11,26 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: mybank_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - network
     volumes:
       - mybank_db:/var/lib/postgresql/data
+
+  myexchange_db:
+    image: postgres
+    container_name: myexchange_db
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: myexchange_db
+    ports:
+      - "5434:5432"
+    networks:
+      - network
+    volumes:
+      - myexchange_db:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4
@@ -28,11 +43,13 @@ services:
       - "5050:80"
     depends_on:
       - mybank_db
+      - myexchange_db
     networks:
       - network
 
 volumes:
   mybank_db:
+  myexchange_db:
 
 networks:
   network:

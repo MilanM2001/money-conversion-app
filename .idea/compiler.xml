@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="mybank-app" />
+        <module name="mybank-web-api" />
+        <module name="myexchange-app" />
+        <module name="mybank-core" />
+        <module name="myexchange-shared" />
+        <module name="mybank-api" />
+        <module name="mybank-shared" />
+        <module name="myexchange-api" />
+        <module name="myexchange-core" />
+        <module name="myexchange-web-api" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>
