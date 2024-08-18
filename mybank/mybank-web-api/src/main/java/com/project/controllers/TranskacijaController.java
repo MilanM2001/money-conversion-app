@@ -64,6 +64,7 @@ public class TranskacijaController {
         }
     }
 
+    //TODO Racun ne moze da prekoraci kreditni_limit ako je tip racuna KREDITNI
     //Zahtev za transakciju, salju se email klijenta, brojevi racuna isplate i uplate
     //Na osnovu tipa transakcije gleda se da li je uplata, isplata ili prenos izmedju racuna
     @PostMapping("/transakcija/{klijentEmail}/{brojRacunaUplate}/{brojRacunaIsplate}")
@@ -73,7 +74,6 @@ public class TranskacijaController {
                                                              @PathVariable(name = "brojRacunaIsplate", required = false) String brojRacunaIsplate) {
         try {
             TransakcijaResponseDto transakcijaResponseDto = transkacijaService.transakcija(transakcijaRequestDto, klijentEmail, brojRacunaUplate, brojRacunaIsplate);
-
 
             return new ResponseEntity<>(transakcijaResponseDto, HttpStatus.OK);
         } catch (EntityNotFoundException e) {

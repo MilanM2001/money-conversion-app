@@ -61,6 +61,7 @@ public class TransakcijaServiceImpl implements TransakcijaService {
 
     @Override
     public List<TransakcijaResponseDto> findAllByKlijentEmail(String email) {
+
         if(klijentRepository.findOneByEmail(email) == null) {
             throw new EntityNotFoundException("Cannot find klijent with the given email: " + email);
         }
