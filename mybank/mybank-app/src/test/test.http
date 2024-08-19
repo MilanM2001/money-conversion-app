@@ -1,0 +1,68 @@
+
+### Get all operators
+GET http://localhost:8080/api/operateri/all
+
+### Find one by email
+GET http://localhost:8080/api/operateri/find/operater
+
+### Create operater
+POST http://localhost:8080/api/operateri/create
+Content-Type: application/json
+
+{
+  "email": "",
+  "password": ""
+}
+
+
+
+
+
+### Get all address
+GET http://localhost:8080/api/adrese/all
+
+### Get one by id
+GET http://localhost:8080/api/adrese/find/1
+
+### Create address
+POST http://localhost:8080/api/adrese/create
+Content-Type: application/json
+
+{
+  "drzava": "",
+  "mesto": "",
+  "ulica": "",
+  "broj": 0
+}
+
+
+
+
+
+### Get all klijent infos
+GET http://localhost:8080/api/klijentInfos/all
+
+### Find one by jmbg
+GET http://localhost:8080/api/klijentInfos/find/1
+
+### Create client info
+POST http://localhost:8080/api/klijentInfos/createClientInfo
+Content-Type: application/json
+
+{
+  "jmbg": "",
+  "ime": "",
+  "prezime": "",
+  "adresaId": 0,
+  "brojTelefona": ""
+}
+
+### Update client info
+PUT http://localhost:8080/api/klijentInfos/updateClientInfo/1
+Content-Type: application/json
+
+{
+  "ime": "",
+  "prezime": "",
+  "brojTelefona": ""
+}

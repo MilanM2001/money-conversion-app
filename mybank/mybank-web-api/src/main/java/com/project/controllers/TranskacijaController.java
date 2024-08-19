@@ -64,7 +64,6 @@ public class TranskacijaController {
         }
     }
 
-    //TODO Racun ne moze da prekoraci kreditni_limit ako je tip racuna KREDITNI
     //Zahtev za transakciju, salju se email klijenta, brojevi racuna isplate i uplate
     //Na osnovu tipa transakcije gleda se da li je uplata, isplata ili prenos izmedju racuna
     @PostMapping("/transakcija/{klijentEmail}/{brojRacunaUplate}/{brojRacunaIsplate}")

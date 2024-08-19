@@ -12,8 +12,10 @@ import com.project.dtos.transakcija.TransakcijaRequestDto;
 import com.project.dtos.transakcija.TransakcijaResponseDto;
 import com.project.enums.StatusRacuna;
 import com.project.enums.StatusTransakcije;
+import com.project.enums.TipRacuna;
 import com.project.enums.TipTransakcije;
 import com.project.exceptions.CurrencyException;
+import com.project.exceptions.KreditniLimitException;
 import com.project.exceptions.NegativeBalanceException;
 import com.project.exceptions.RacunClosedException;
 import com.project.serviceinterfaces.TransakcijaService;
@@ -194,9 +196,9 @@ public class TransakcijaServiceImpl implements TransakcijaService {
         //Valuta transakcije i valuta racuna isplate moraju biti iste
         if (transakcijaRequestDto.getValutaTransakcije() != racunIsplate.getValuta()) {
             throw new CurrencyException("Transakcija currency and racun isplate currency are different");
-        }
-
-        if (racunIsplate.getTrenutniIznos() < transakcijaRequestDto.getIznosTransakcije()) {
+        } else if (racunIsplate.getTipRacuna() == TipRacuna.KREDITNI && racunIsplate.getKreditniLimit() < transakcijaRequestDto.getIznosTransakcije()) {
+            throw new KreditniLimitException("Kreditni limit exceeded");
+        } else if (racunIsplate.getTrenutniIznos() < transakcijaRequestDto.getIznosTransakcije()) {
             throw new NegativeBalanceException("Not enough balance");
         }
 

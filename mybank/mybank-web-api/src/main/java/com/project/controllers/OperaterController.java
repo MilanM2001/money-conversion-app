@@ -59,7 +59,7 @@ public class OperaterController {
 
     //Kreiranje operatera
     @PostMapping("/create")
-    public ResponseEntity<OperaterRequestDto> create(@RequestBody OperaterRequestDto operaterRequestDto) {
+    public ResponseEntity<OperaterRequestDto> create(@RequestBody @Valid OperaterRequestDto operaterRequestDto) {
         try {
             OperaterRequestDto operater = operaterService.create(operaterRequestDto);
 

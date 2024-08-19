@@ -53,7 +53,7 @@ public class KlijentInfoController {
 
     //Operater kreira informacije klijenta
     @PostMapping("/createClientInfo")
-    public ResponseEntity<KlijentInfoRequestDto> createClientInfo(@RequestBody KlijentInfoRequestDto klijentInfoRequestDto) {
+    public ResponseEntity<KlijentInfoRequestDto> createClientInfo(@RequestBody @Valid KlijentInfoRequestDto klijentInfoRequestDto) {
         try {
             KlijentInfoRequestDto klijentInfo = klijentInfoService.create(klijentInfoRequestDto);
 
