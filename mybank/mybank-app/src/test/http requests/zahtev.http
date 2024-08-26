@@ -1,0 +1,26 @@
+### Get all
+GET http://localhost:8080/api/zahtevi/all
+
+### All Not Decided
+GET http://localhost:8080/api/zahtevi/allNonDecided
+
+### Find all by client email
+GET http://localhost:8080/api/zahtevi/allByClientEmail/{{email}}
+
+### Open new
+POST http://localhost:8080/api/zahtevi/open/{{email}}
+Content-Type: application/json
+
+{
+  "tipRacuna": "TRANSAKCIONI",
+  "valuta": "RSD",
+  "brojRacuna": "",
+  "kreditniLimit": 0
+}
+
+### Close by broj racuna
+POST http://localhost:8080/api/zahtevi/close/{{email}}/{{brojRacuna}}
+Content-Type: application/x-www-form-urlencoded
+
+### Decide by broj racuna
+PUT http://localhost:8080/api/zahtevi/decide/{{brojRacuna}}/{{decision}}

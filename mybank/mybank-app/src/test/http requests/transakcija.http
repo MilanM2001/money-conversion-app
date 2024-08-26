@@ -1,0 +1,12 @@
+### Get all
+GET http://localhost:8080/api/transakcije/all
+
+### Find all by client email
+GET http://localhost:8080/api/transakcije/allByClientEmail/{{email}}
+
+### Find all by client email sorted
+GET http://localhost:8080/api/transakcije/allByClientEmailSorted/{{email}}?
+    sortBy={{$random.alphanumeric(8)}}
+
+### Create
+POST http://localhost:8080/api/transakcije/transakcija/{{klijentEmail}}/{{brojRacunaUplate}}/{{brojRacunaIsplate}}

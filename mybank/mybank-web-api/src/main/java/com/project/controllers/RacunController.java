@@ -5,6 +5,7 @@ import com.project.dtos.racun.RacunUpdateDto;
 import com.project.exceptions.EntityStatusException;
 import com.project.serviceinterfaces.RacunService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -68,7 +69,7 @@ public class RacunController {
 
     //Racun moze da se update samo ako je u statusu KREIRAN
     @PutMapping("/update/{brojRacuna}")
-    public ResponseEntity<RacunUpdateDto> update(@RequestBody RacunUpdateDto racunUpdateDto, @PathVariable("brojRacuna") String brojRacuna) {
+    public ResponseEntity<RacunUpdateDto> update(@RequestBody @Valid RacunUpdateDto racunUpdateDto, @PathVariable("brojRacuna") String brojRacuna) {
         try {
             RacunUpdateDto racunUpdate = racunService.update(racunUpdateDto, brojRacuna);
 

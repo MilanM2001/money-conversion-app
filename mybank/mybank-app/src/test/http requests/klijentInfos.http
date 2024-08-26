@@ -1,0 +1,27 @@
+### Get all
+GET http://localhost:8080/api/klijentInfos/all
+
+### Find one by jmbg
+GET http://localhost:8080/api/klijentInfos/find/1
+
+### Create
+POST http://localhost:8080/api/klijentInfos/createClientInfo
+Content-Type: application/json
+
+{
+  "jmbg": "",
+  "ime": "",
+  "prezime": "",
+  "adresaId": 0,
+  "brojTelefona": ""
+}
+
+### Update
+PUT http://localhost:8080/api/klijentInfos/updateClientInfo/1
+Content-Type: application/json
+
+{
+  "ime": "",
+  "prezime": "",
+  "brojTelefona": ""
+}

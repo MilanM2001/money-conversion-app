@@ -1,0 +1,15 @@
+
+### Get all
+GET http://localhost:8080/api/operateri/all
+
+### Find one by email
+GET http://localhost:8080/api/operateri/find/operater
+
+### Create
+POST http://localhost:8080/api/operateri/create
+Content-Type: application/json
+
+{
+  "email": "",
+  "password": ""
+}

@@ -1,0 +1,21 @@
+### Get all
+GET http://localhost:8080/api/racuni/all
+
+### Find filtered
+GET http://localhost:8080/api/racuni/allFiltered?
+    klijent_email={{$random.alphanumeric(8)}}&
+    status_racuna={{$random.alphanumeric(8)}}&
+    datum_poslednje_promene={{$random.alphanumeric(8)}}
+
+### Find one by Client Email
+GET http://localhost:8080/api/racuni/allByClientEmail/{{email}}
+
+### Update
+PUT http://localhost:8080/api/racuni/update/{{brojRacuna}}
+Content-Type: application/json
+
+{
+  "nazivBanke": "",
+  "tipRacuna": "TRANSAKCIONI",
+  "valuta": "RSD"
+}

@@ -1,0 +1,18 @@
+### Get all
+GET http://localhost:8080/api/klijenti/all
+
+### Find one by email
+GET http://localhost:8080/api/klijenti/find/{{email}}
+
+### Create
+POST http://localhost:8080/api/klijenti/createClient
+Content-Type: application/json
+
+{
+  "email": "",
+  "password": "",
+  "jmbg": ""
+}
+
+### Delete by JMBG
+DELETE http://localhost:8080/api/klijenti/delete/{{jmbg}}
