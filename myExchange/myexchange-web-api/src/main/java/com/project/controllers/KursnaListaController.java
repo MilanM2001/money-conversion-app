@@ -87,8 +87,6 @@ public class KursnaListaController {
         }
     }
 
-    //TODO DODAJ EXCEPTION NOT FOUND
-    //TODO Pokusati da kreiram nesto ovde pa na drugi servis eror da dobijem i onda rollback ovde
     @PostMapping("/exchange")
     public KonverzijaResponseDto exchange(@RequestBody KonverzijaRequestDto konverzijaRequestDto) {
         try {
